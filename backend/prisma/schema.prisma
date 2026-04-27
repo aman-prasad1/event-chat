@@ -7,11 +7,29 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Status {
+  Pending
+  Sent
+  Delivered
+  Seen
+}
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  email         String   @unique
+  first_name    String
+  last_name     String
+  password      String
+  avatar        String
+  refresh_Token String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Messages {
+  id         String @id @default(cuid())
+  senderId   String
+  recieverId String
+  content    String
+  status     Status @default(Pending)
 }
