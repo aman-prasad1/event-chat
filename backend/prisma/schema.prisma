@@ -16,11 +16,12 @@ enum Status {
 
 model User {
   id            String   @id @default(cuid())
-  email         String   @unique
+  username      String   @unique
   first_name    String
   last_name     String
   password      String
-  avatar        String
+  avatar_url    String
+  avatar_key    String
   refresh_Token String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
