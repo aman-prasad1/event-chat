@@ -16,7 +16,7 @@ app.get('/health', (req, res) => {
 
 
 // import routers
-import authRouter from './models/auth/router.js';
+import authRouter from './modules/auth/router.js';
 import { error } from 'console';
 
 // use routers
