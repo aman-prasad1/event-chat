@@ -153,8 +153,8 @@ const login = asyncHandler(async (req, res) => {
     
         res
             .status(200)
-            .cookie('refreshtoken', refreshToken, options)
-            .cookie('accesstoken', accessToken, options)
+            .cookie('refreshToken', refreshToken, options)
+            .cookie('accessToken', accessToken, options)
             .json(
                 new ApiResponse(200, 'Login successful', responseData)
             );
@@ -163,9 +163,56 @@ const login = asyncHandler(async (req, res) => {
     }
 });
 
+const refreshTokens = asyncHandler(async (req, res) => {
+    try {
+        const refreshToken = req.cookies?.refreshToken;
+    
+        if (!refreshToken) {
+            throw new ApiError(401, 'Unauthorized: No refresh token provided');
+        }
+    
+        // Verify the refresh token
+        const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        
+        // Check if the refresh token exists in the database
+        const user = await prisma.user.findUnique({ where: { id: decodedToken.id } });
+        if (!user || user.refresh_Token !== refreshToken) {
+            throw new ApiError(401, 'Unauthorized: Refresh token not found');
+        }
+    
+        // Generate a new access token
+        const newAccessToken = generateAccessToken(user);
+        const newRefreshToken = generateRefreshToken(user);
+    
+        // Update the refresh token in the database
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { refresh_Token: newRefreshToken }
+        });
+    
+        const options = {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            maxAge: 24 * 60 * 60 * 1000 * 7,
+            path: '/'
+        }
+    
+        res
+            .status(200)
+            .cookie('accessToken', newAccessToken, options)
+            .cookie('refreshToken', newRefreshToken, options)
+            .json(
+                new ApiResponse(200, 'Access token refreshed successfully')
+            );
+    } catch (error) {
+        throw new ApiError(error.statusCode || 500, error.message || 'Internal Server Error');
+    }
+});
 
 
 export { 
     register,
     login,
+    refreshTokens
 }
