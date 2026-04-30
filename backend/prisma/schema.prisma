@@ -25,12 +25,85 @@ model User {
   refresh_Token String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  messages        Message[]
+  memberships     ConversationMember[]
+  messageStatuses MessageStatus[]
 }
 
-model Messages {
-  id         String @id @default(cuid())
-  senderId   String
-  recieverId String
-  content    String
-  status     Status @default(Pending)
+enum ConversationType {
+  direct
+  group
+}
+
+model Conversation {
+  id        String           @id @default(uuid())
+  type      ConversationType
+  name      String?
+  createdAt DateTime         @default(now())
+
+  members  ConversationMember[]
+  messages Message[]
+}
+
+enum MemberRole {
+  admin
+  member
+}
+
+model ConversationMember {
+  id             String     @id @default(uuid())
+  conversationId String
+  userId         String
+  role           MemberRole @default(member)
+  joinedAt       DateTime   @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+enum MessageType {
+  text
+  image
+  file
+}
+
+model Message {
+  id             String      @id @default(uuid())
+  conversationId String
+  senderId       String
+  content        Json
+  type           MessageType @default(text)
+  createdAt      DateTime    @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  statuses MessageStatus[]
+
+  @@index([conversationId, createdAt(sort: Desc)])
+  @@index([senderId])
+}
+
+enum MessageStatusEnum {
+  sent
+  delivered
+  seen
+}
+
+model MessageStatus {
+  id        String            @id @default(uuid())
+  messageId String
+  userId    String
+  status    MessageStatusEnum
+  updatedAt DateTime          @updatedAt
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([userId])
 }
