@@ -32,7 +32,7 @@ const createDirectConversation = asyncHandler(async (req, res) => {
         if (existing && existing.members.length === 2) {
             res
                 .status(200)
-                .json(new ApiResponse(200, 'Direct conversation already exists', { id: existing.id, "type": "direct" }));
+                .json(new ApiResponse(200, 'Direct conversation already exists', { "conversationId": existing.id, "type": "direct" }));
             return;
         }
 
@@ -51,7 +51,7 @@ const createDirectConversation = asyncHandler(async (req, res) => {
 
         res
             .status(201)
-            .json(new ApiResponse(201, 'Direct conversation created successfully', { id: conversation.id, "type": "direct" }));
+            .json(new ApiResponse(201, 'Direct conversation created successfully', { "conversationId": conversation.id, "type": "direct" }));
 
     } catch (error) {
         // if userId does not exist in the database, prisma will throw a foreign key constraint error with code P2003
