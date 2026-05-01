@@ -63,6 +63,40 @@ const createDirectConversation = asyncHandler(async (req, res) => {
     }
 });
 
+
+const getConverstionMessages = asyncHandler(async (req, res) => {
+
+    const { conversationId } = req.params;
+
+    // check if the conversation exists and the user is a member of it
+    const isMember = await prisma.conversationMember.findFirst({
+        where: {
+            conversationId,
+            userId: req.user.id
+        }
+    });
+
+    if (!isMember) {
+        throw new ApiError(403, 'You are not a member of this conversation');
+    }
+
+    const messages = await prisma.message.findMany({
+        where: { conversationId },
+        orderBy: { createdAt: 'desc' },
+        take: req.params.limit || 20,
+        ...(req.params.cursor && {
+            cursor: { id: req.params.cursor },
+            skip: 1
+        })
+    });
+
+    res
+        .status(200)
+        .json(new ApiResponse(200, 'Messages fetched successfully', {"messages": messages, "nextCursor": messages.length > 0 ? messages[messages.length - 1].id : null}));
+
+});
+
 export {
     createDirectConversation,
+    getConverstionMessages
 }
