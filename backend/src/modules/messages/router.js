@@ -8,6 +8,6 @@ import {
 const router = Router();
 
 router.post('/conversations/direct', authenticateAccessToken, createDirectConversation);
-router.get('/conversations/:conversationId/messages', authenticateAccessToken, getConverstionMessages);
+router.get('/:conversationId', authenticateAccessToken, getConverstionMessages);
 
 export default router;
