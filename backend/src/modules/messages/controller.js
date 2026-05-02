@@ -85,16 +85,16 @@ const getConverstionMessages = asyncHandler(async (req, res) => {
     const messages = await prisma.message.findMany({
         where: { conversationId },
         orderBy: { createdAt: 'desc' },
-        take: req.params.limit || 20,
-        ...(req.params.cursor && {
-            cursor: { id: req.params.cursor },
+        take: parseInt(req.query.limit) || 20,
+        ...(req.query.cursor && {
+            cursor: { id: req.query.cursor },
             skip: 1
         })
     });
 
     res
         .status(200)
-        .json(new ApiResponse(200, 'Messages fetched successfully', {"messages": messages, "nextCursor": messages.length > 0 ? messages[messages.length - 1].id : null}));
+        .json(new ApiResponse(200, 'Messages fetched successfully', { "messages": messages, "nextCursor": messages.length > 0 ? messages[messages.length - 1].id : null }));
 
 });
 
