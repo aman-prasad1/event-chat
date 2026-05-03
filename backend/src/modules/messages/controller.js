@@ -185,6 +185,14 @@ const createConversationMessage = asyncHandler(async (req, res) => {
                     message
                 });
             }
+
+            await prisma.messageStatus.create({
+                data: {
+                    messageId: message.id,
+                    userId: m.userId,
+                    status: 'sent'
+                }
+            })
         }
 
         res
