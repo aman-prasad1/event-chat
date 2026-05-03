@@ -3,6 +3,7 @@ import { ApiError } from '../../utils/ApiError.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
 import { uploadOnCloudinary } from '../../utils/cloudinary.js';
+import { io, userSocketMap } from '../../socketIo.js';
 import fs from 'fs';
 
 const createDirectConversation = asyncHandler(async (req, res) => {
@@ -152,6 +153,12 @@ const createConversationMessage = asyncHandler(async (req, res) => {
                 mimetype: req.file.mimetype,
                 size: req.file.size
             };
+
+            fs.unlink(req.file.path, (err) => {
+                if(err) {
+                    console.error('Error deleting local file:', err);
+                }
+            });
         } else {
             throw new ApiError(400, 'Unsupported message type');
         }
@@ -164,10 +171,21 @@ const createConversationMessage = asyncHandler(async (req, res) => {
                 type
             }
         });
-
-        fs.unlink(req.file.path, (err) => {
-            console.error('Error deleting local file:', err);
+        
+        const members = await prisma.conversationMember.findMany({
+            where: { conversationId },
+            select: { userId: true }
         });
+
+        for (const m of members) {
+            if(m.userId === req.user.id) continue; // don't send the message to the sender
+            const socketId = userSocketMap.get(m.userId);
+            if (socketId) {
+                io.to(socketId).emit("message_received", {
+                    message
+                });
+            }
+        }
 
         res
             .status(201)
@@ -176,7 +194,9 @@ const createConversationMessage = asyncHandler(async (req, res) => {
         if (req.file) {
             // Ensure that the local file is deleted after processing
             fs.unlink(req.file.path, (err) => {
-                console.error('Error deleting local file:', err);
+                if(err) {
+                    console.error('Error deleting local file:', err);
+                }
             });
         }
 
