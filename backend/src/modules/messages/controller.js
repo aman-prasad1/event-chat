@@ -69,33 +69,38 @@ const createDirectConversation = asyncHandler(async (req, res) => {
 
 const getConverstionMessages = asyncHandler(async (req, res) => {
 
-    const { conversationId } = req.params;
-
-    // check if the conversation exists and the user is a member of it
-    const isMember = await prisma.conversationMember.findFirst({
-        where: {
-            conversationId,
-            userId: req.user.id
+    try {
+        const { conversationId } = req.params;
+    
+        // check if the conversation exists and the user is a member of it
+        const isMember = await prisma.conversationMember.findFirst({
+            where: {
+                conversationId,
+                userId: req.user.id
+            }
+        });
+        if (!isMember) {
+            throw new ApiError(403, 'You are not a member of this conversation');
         }
-    });
-
-    if (!isMember) {
-        throw new ApiError(403, 'You are not a member of this conversation');
+    
+    
+        // fetch messages with pagination (20 messages per page) and return the next cursor for pagination
+        const messages = await prisma.message.findMany({
+            where: { conversationId },
+            orderBy: { createdAt: 'desc' },
+            take: parseInt(req.query.limit) || 20,
+            ...(req.query.cursor && {
+                cursor: { id: req.query.cursor },
+                skip: 1
+            })
+        });
+    
+        res
+            .status(200)
+            .json(new ApiResponse(200, 'Messages fetched successfully', { "messages": messages, "nextCursor": messages.length > 0 ? messages[messages.length - 1].id : null }));
+    } catch (error) {
+        throw new ApiError(error.statusCode || 500, error.message || 'Failed to fetch conversation messages');
     }
-
-    const messages = await prisma.message.findMany({
-        where: { conversationId },
-        orderBy: { createdAt: 'desc' },
-        take: parseInt(req.query.limit) || 20,
-        ...(req.query.cursor && {
-            cursor: { id: req.query.cursor },
-            skip: 1
-        })
-    });
-
-    res
-        .status(200)
-        .json(new ApiResponse(200, 'Messages fetched successfully', { "messages": messages, "nextCursor": messages.length > 0 ? messages[messages.length - 1].id : null }));
 
 });
 
