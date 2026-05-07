@@ -2,10 +2,12 @@ import { Server } from 'socket.io';
 import cookie from 'cookie';
 import jwt from 'jsonwebtoken';
 import { prisma } from './db/index.js';
+import { publishClient, subscribeClient } from './redis/index.js';
 
 let io;
 let userSocketMap = new Map();
 
+const SOCKET_EVENTS_CHANNEL = 'socket_events';
 
 const emitToUser = (userId, event, data) => {
     const sockets = userSocketMap.get(userId);
@@ -16,12 +18,36 @@ const emitToUser = (userId, event, data) => {
     }
 };
 
+const publishToRedis = async (event, data) => {
+    try {
+        await publishClient.publish(SOCKET_EVENTS_CHANNEL, JSON.stringify({ event, data }));
+    } catch (err) {
+        console.error("Failed to publish to Redis:", err);
+    }
+};
+
+const handleRedisMessage = (message) => {
+    try {
+        const { event, data } = JSON.parse(message);
+
+        emitToUser(data.recipientId, event, data);
+    } catch (err) {
+        console.error("Failed to handle Redis message:", err);
+    }
+};
+
 const initializeSocket = (httpServer) => {
     io = new Server(httpServer, {
         cors: {
             origin: process.env.CORS_ORIGIN,
             credentials: true
         }
+    });
+
+    subscribeClient.subscribe(SOCKET_EVENTS_CHANNEL);
+
+    subscribeClient.on('message', (channel, message) => {
+        handleRedisMessage(message);
     });
 
     io.use((socket, next) => {
@@ -76,19 +102,20 @@ const initializeSocket = (httpServer) => {
 
 
                 // Update message status to delivered for the recipient
-                const messageStatus = await prisma.messageStatus.update({
+                await prisma.messageStatus.update({
                     where: { messageId_userId: { messageId, userId } },
                     data: { status: 'delivered' }
                 });
 
 
                 // Notify the sender about the delivery status update
-                emitToUser(message.senderId, "message_delivered_update", {
+                await publishToRedis("message_delivered_update", {
+                    recipientId: message.senderId,
                     messageId,
                     conversationId: message.conversationId,
                     userId
                 });
-                
+
             } catch (error) {
                 console.log("Error in message_delivered event: ", error);
             }
@@ -119,7 +146,8 @@ const initializeSocket = (httpServer) => {
 
 
                 // Notify the sender about the seen status update
-                emitToUser(message.senderId, "message_seen_update", {
+                await publishToRedis("message_seen_update", {
+                    recipientId: message.senderId,
                     messageId,
                     conversationId: message.conversationId,
                     userId
@@ -143,4 +171,4 @@ const initializeSocket = (httpServer) => {
     });
 }
 
-export { io, initializeSocket, userSocketMap, emitToUser };
+export { io, initializeSocket, userSocketMap, publishToRedis };

@@ -3,7 +3,7 @@ import { ApiError } from '../../utils/ApiError.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
 import { uploadOnCloudinary } from '../../utils/cloudinary.js';
-import { io, emitToUser } from '../../socketIo.js';
+import { io, publishToRedis } from '../../socketIo.js';
 import fs from 'fs';
 
 const createDirectConversation = asyncHandler(async (req, res) => {
@@ -71,7 +71,7 @@ const getConverstionMessages = asyncHandler(async (req, res) => {
 
     try {
         const { conversationId } = req.params;
-    
+
         // check if the conversation exists and the user is a member of it
         const isMember = await prisma.conversationMember.findFirst({
             where: {
@@ -82,8 +82,8 @@ const getConverstionMessages = asyncHandler(async (req, res) => {
         if (!isMember) {
             throw new ApiError(403, 'You are not a member of this conversation');
         }
-    
-    
+
+
         // fetch messages with pagination (20 messages per page) and return the next cursor for pagination
         const messages = await prisma.message.findMany({
             where: { conversationId },
@@ -94,7 +94,7 @@ const getConverstionMessages = asyncHandler(async (req, res) => {
                 skip: 1
             })
         });
-    
+
         res
             .status(200)
             .json(new ApiResponse(200, 'Messages fetched successfully', { "messages": messages, "nextCursor": messages.length > 0 ? messages[messages.length - 1].id : null }));
@@ -160,7 +160,7 @@ const createConversationMessage = asyncHandler(async (req, res) => {
             };
 
             fs.unlink(req.file.path, (err) => {
-                if(err) {
+                if (err) {
                     console.error('Error deleting local file:', err);
                 }
             });
@@ -176,26 +176,30 @@ const createConversationMessage = asyncHandler(async (req, res) => {
                 type
             }
         });
-        
+
         const members = await prisma.conversationMember.findMany({
             where: { conversationId },
             select: { userId: true }
         });
 
-        for (const m of members) {
-            if(m.userId === req.user.id) continue; // don't send the message to the sender
-            emitToUser(m.userId, "message_received", {
-                message
-            });
+        await Promise.all(
+            members
+                .filter(m => m.userId !== req.user.id)
+                .map(async (m) => {
+                    await prisma.messageStatus.create({
+                        data: {
+                            messageId: message.id,
+                            userId: m.userId,
+                            status: 'sent'
+                        }
+                    });
 
-            await prisma.messageStatus.create({
-                data: {
-                    messageId: message.id,
-                    userId: m.userId,
-                    status: 'sent'
-                }
-            })
-        }
+                    await publishToRedis("message_received", {
+                        recipientId: m.userId,
+                        message
+                    });
+                })
+        );
 
         res
             .status(201)
@@ -204,7 +208,7 @@ const createConversationMessage = asyncHandler(async (req, res) => {
         if (req.file) {
             // Ensure that the local file is deleted after processing
             fs.unlink(req.file.path, (err) => {
-                if(err) {
+                if (err) {
                     console.error('Error deleting local file:', err);
                 }
             });
