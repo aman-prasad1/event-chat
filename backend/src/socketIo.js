@@ -6,6 +6,16 @@ import { prisma } from './db/index.js';
 let io;
 let userSocketMap = new Map();
 
+
+const emitToUser = (userId, event, data) => {
+    const sockets = userSocketMap.get(userId);
+    if (sockets) {
+        for (const socketId of sockets) {
+            io.to(socketId).emit(event, data);
+        }
+    }
+};
+
 const initializeSocket = (httpServer) => {
     io = new Server(httpServer, {
         cors: {
@@ -41,7 +51,10 @@ const initializeSocket = (httpServer) => {
 
     io.on('connection', (socket) => {
         const userId = socket.data.userId;
-        userSocketMap.set(userId, socket.id);
+        if (!userSocketMap.has(userId)) {
+            userSocketMap.set(userId, new Set());
+        }
+        userSocketMap.get(userId).add(socket.id);
 
 
         // handle message read receipts
@@ -70,14 +83,12 @@ const initializeSocket = (httpServer) => {
 
 
                 // Notify the sender about the delivery status update
-                const senderSocket = userSocketMap.get(message.senderId);
-                if (senderSocket) {
-                    io.to(senderSocket).emit("message_delivered_update", {
-                        messageId,
-                        conversationId: message.conversationId,
-                        userId
-                    });
-                }
+                emitToUser(message.senderId, "message_delivered_update", {
+                    messageId,
+                    conversationId: message.conversationId,
+                    userId
+                });
+                
             } catch (error) {
                 console.log("Error in message_delivered event: ", error);
             }
@@ -94,28 +105,26 @@ const initializeSocket = (httpServer) => {
                     }
                 });
                 if (!message) return socket.emit("action_error", { message: "Unauthorized or invalid message ID" });
-    
-    
+
+
                 // Prevent sender from marking their own message as seen
                 if (message.senderId === userId) return socket.emit("action_error", { message: "Cannot mark your own message as seen" });
-    
-    
+
+
                 // Update message status to seen for the recipient
                 const messageStatus = await prisma.messageStatus.update({
                     where: { messageId_userId: { messageId, userId } },
                     data: { status: 'seen' }
                 });
-    
-    
+
+
                 // Notify the sender about the seen status update
-                const senderSocket = userSocketMap.get(message.senderId);
-                if (senderSocket) {
-                    io.to(senderSocket).emit("message_seen_update", {
-                        messageId,
-                        conversationId: message.conversationId,
-                        userId
-                    });
-                }
+                emitToUser(message.senderId, "message_seen_update", {
+                    messageId,
+                    conversationId: message.conversationId,
+                    userId
+                });
+
             } catch (error) {
                 console.error("Error in message_seen event: ", error);
             }
@@ -123,9 +132,15 @@ const initializeSocket = (httpServer) => {
 
 
         socket.on('disconnect', () => {
-            userSocketMap.delete(userId);
+            const sockets = userSocketMap.get(userId);
+            if (sockets) {
+                sockets.delete(socket.id);
+                if (sockets.size === 0) {
+                    userSocketMap.delete(userId);
+                }
+            }
         });
     });
 }
 
-export { io, initializeSocket, userSocketMap };
+export { io, initializeSocket, userSocketMap, emitToUser };

@@ -3,7 +3,7 @@ import { ApiError } from '../../utils/ApiError.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
 import { uploadOnCloudinary } from '../../utils/cloudinary.js';
-import { io, userSocketMap } from '../../socketIo.js';
+import { io, emitToUser } from '../../socketIo.js';
 import fs from 'fs';
 
 const createDirectConversation = asyncHandler(async (req, res) => {
@@ -184,12 +184,9 @@ const createConversationMessage = asyncHandler(async (req, res) => {
 
         for (const m of members) {
             if(m.userId === req.user.id) continue; // don't send the message to the sender
-            const socketId = userSocketMap.get(m.userId);
-            if (socketId) {
-                io.to(socketId).emit("message_received", {
-                    message
-                });
-            }
+            emitToUser(m.userId, "message_received", {
+                message
+            });
 
             await prisma.messageStatus.create({
                 data: {
