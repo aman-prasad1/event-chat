@@ -26,6 +26,11 @@ const publishToRedis = async (event, data) => {
     }
 };
 
+const isUserOnline = async (userId) => {
+    const presence = await publishClient.get(`presence:${userId}`);
+    return presence === 'online';
+};
+
 const handleRedisMessage = (message) => {
     try {
         const { event, data } = JSON.parse(message);
@@ -75,12 +80,34 @@ const initializeSocket = (httpServer) => {
         }
     });
 
-    io.on('connection', (socket) => {
+    io.on('connection', async (socket) => {
         const userId = socket.data.userId;
         if (!userSocketMap.has(userId)) {
             userSocketMap.set(userId, new Set());
         }
         userSocketMap.get(userId).add(socket.id);
+
+
+        // Mark user as online in Redis
+        await publishClient.set(`presence:${userId}`, 'online');
+
+        try {
+            const undeliveredStatuses = await prisma.messageStatus.findMany({
+                where: {
+                    userId,
+                    status: 'sent'
+                },
+                include: {
+                    message: true
+                }
+            });
+
+            for (const { message } of undeliveredStatuses) {
+                socket.emit('message_received', { message });
+            }
+        } catch (error) {
+            console.error("Error flushing undelivered messages: ", error);
+        }
 
 
         // handle message read receipts
@@ -139,7 +166,7 @@ const initializeSocket = (httpServer) => {
 
 
                 // Update message status to seen for the recipient
-                const messageStatus = await prisma.messageStatus.update({
+                await prisma.messageStatus.update({
                     where: { messageId_userId: { messageId, userId } },
                     data: { status: 'seen' }
                 });
@@ -159,16 +186,19 @@ const initializeSocket = (httpServer) => {
         });
 
 
-        socket.on('disconnect', () => {
+        socket.on('disconnect', async () => {
             const sockets = userSocketMap.get(userId);
             if (sockets) {
                 sockets.delete(socket.id);
                 if (sockets.size === 0) {
                     userSocketMap.delete(userId);
+
+                    // delete presence key from Redis when user goes offline
+                    await publishClient.del(`presence:${userId}`);
                 }
             }
         });
     });
 }
 
-export { io, initializeSocket, userSocketMap, publishToRedis };
+export { io, initializeSocket, userSocketMap, publishToRedis, isUserOnline };

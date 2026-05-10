@@ -3,7 +3,7 @@ import { ApiError } from '../../utils/ApiError.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
 import { uploadOnCloudinary } from '../../utils/cloudinary.js';
-import { io, publishToRedis } from '../../socketIo.js';
+import { io, isUserOnline, publishToRedis } from '../../socketIo.js';
 import fs from 'fs';
 
 const createDirectConversation = asyncHandler(async (req, res) => {
@@ -194,10 +194,13 @@ const createConversationMessage = asyncHandler(async (req, res) => {
                         }
                     });
 
-                    await publishToRedis("message_received", {
-                        recipientId: m.userId,
-                        message
-                    });
+                    const online = await isUserOnline(m.userId);
+                    if (online) {
+                        await publishToRedis("message_received", {
+                            recipientId: m.userId,
+                            message
+                        });
+                    }
                 })
         );
 
