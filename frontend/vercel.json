@@ -3,9 +3,6 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "devCommand": "vite",
-  "env": {
-    "VITE_API_URL": "@vite_api_url"
-  },
   "rewrites": [
     {
       "source": "/(.*)",
