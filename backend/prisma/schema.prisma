@@ -21,7 +21,7 @@ model User {
   last_name     String
   password      String
   avatar_url    String
-  avatar_key    String
+  avatar_key    String?
   refresh_Token String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

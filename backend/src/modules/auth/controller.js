@@ -35,21 +35,10 @@ const register = asyncHandler(async (req, res) => {
             throw new ApiError(400, 'All fields are required');
         }
     
-        // check if the file is provided
-        if (!req.file) {
-            throw new ApiError(400, 'Profile image is required');
-        }
-    
         // Check if the username already exists
         const existingUser = await prisma.user.findUnique({ where: { username } });
         if (existingUser) {
             throw new ApiError(400, 'Username already exists');
-        }
-    
-        // Upload image to cloudinary and remove the local file after uploading
-        const cloudinaryResponse = await uploadOnCloudinary(req.file.path, 'avatars');
-        if (!cloudinaryResponse || !cloudinaryResponse.secure_url) {
-            throw new ApiError(500, 'Failed to upload profile image');
         }
     
         // Hashing the password before storing it in the database
@@ -62,8 +51,7 @@ const register = asyncHandler(async (req, res) => {
                 last_name,
                 username,
                 password: hashedPassword,
-                avatar_key: cloudinaryResponse.public_id,
-                avatar_url: cloudinaryResponse.secure_url
+                avatar_url: `https://api.dicebear.com/5.x/initials/svg?seed=${first_name}+${last_name}`
             },
         });
     
@@ -72,15 +60,6 @@ const register = asyncHandler(async (req, res) => {
             where: { id: newUser.id },
             select: UserType
         });
-
-        
-        // Ensure that the local file is deleted after processing
-        fs.unlink(req.file.path, (err) => {
-            if (err) {
-                console.error('Error deleting local file:', err);
-            }
-        });
-    
     
         res
             .status(201)
@@ -89,12 +68,6 @@ const register = asyncHandler(async (req, res) => {
             );
 
     } catch (error) {
-        // Ensure that the local file is deleted even if an error occurs
-        fs.unlink(req.file.path, (err) => {
-            if (err) {
-                console.error('Error deleting local file:', err);
-            }
-        });
         throw new ApiError(error.statusCode || 500, error.message || 'Internal Server Error');
     }
 });
