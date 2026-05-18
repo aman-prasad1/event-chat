@@ -3,6 +3,7 @@ import { Link, useNavigate} from "react-router-dom";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
 import { useAuth } from "../hooks/useAuth";
 import { userStore } from "../store/userStore";
+import { ToastContainer, toast } from 'react-toastify';
 
 
 const Login = () => {
@@ -26,15 +27,22 @@ const Login = () => {
       password: e.target.password.value,
     };
 
-    const result = await login.mutateAsync(credentials);
-    
-    if(result) {
+    try {
+      const res = await toast.promise(login.mutateAsync(credentials), {
+        pending: 'Logging in...',
+      });
+      
+      if(res) {
         navigate('/')
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Login failed. Please try again.');
     }
   };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center px-4" style={{ backgroundColor: 'var(--color-primary)', fontFamily: 'var(--font-sans)' }}>
+      <ToastContainer />
       <main className="w-full max-w-md rounded-2xl shadow-xl p-8" style={{ backgroundColor: 'var(--color-primary)', borderWidth: '1px', borderColor: 'var(--color-border)' }}>
         <header className="mb-6 text-center">
           <h1 className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
