@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+    /* Light Theme */
+    --color-primary: #fff;
+    --color-text-primary: #101828;
+    --color-text-secondary: #475467;
+    --color-border: #e5e7eb;
+    --color-placeholder: #9ca3af;
+    --color-accent-primary: #4f46e5;
+    --color-accent-primary-hover: #4338ca;
+    --color-accent-primary-light: #a5b4fc;
+    --color-accent-primary-lighter: #818cf8;
+}
+/* Font stacks */
+:root {
+    --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+}
+
+/* Base typography */
+html, body, #root {
+    height: 100%;
+}
+
+body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg, transparent);
+}
+
+/* Chat-specific tweaks */
+.message {
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+code, pre {
+    font-family: var(--font-mono);
+    font-size: 13px;
+}
+

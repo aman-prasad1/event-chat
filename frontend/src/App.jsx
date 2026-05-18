@@ -1,10 +1,24 @@
-import React from 'react'
+import {React, lazy, Suspense} from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
+
+// Lazy load the component
+const Login = lazy(() => import('./pages/Login'))
+const SignUp = lazy(() => import('./pages/SignUp'))
+
 
 const App = () => {
   return (
-    <div>
-      Under Development
-    </div>
+    <BrowserRouter>
+      <Suspense fallback={<div>Loading...</div>}>
+        <div className="min-h-screen font-sans">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+          </Routes>
+        </div>
+      </Suspense>
+    </BrowserRouter>
   )
 }
 
