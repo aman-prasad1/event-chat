@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 // Lazy load the component
 const Login = lazy(() => import('./pages/Login'))
 const SignUp = lazy(() => import('./pages/SignUp'))
+const Home = lazy(() => import('./pages/Home'))
 
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/" element={<Home />} />
           </Routes>
         </div>
       </Suspense>

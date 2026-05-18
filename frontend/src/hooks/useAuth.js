@@ -8,10 +8,9 @@ const register = async (userData) => {
   setIsLoading(true);
   try {
     const response = await axiosInstance.post('/auth/register', userData);
-    setUser(response.data);
     return response.data;
   } catch (error) {
-    console.error('Registration failed:', error);
+    console.error('Registration failed:', error.response?.data || error.message);
     throw error;
   } finally {
     setIsLoading(false);
@@ -24,10 +23,10 @@ const login = async (credentials) => {
   setIsLoading(true);
   try {
     const response = await axiosInstance.post('/auth/login', credentials);
-    setUser(response.data);
+    setUser(response.data.data);
     return response.data;
   } catch (error) {
-    console.error('Login failed:', error);
+    console.error('Login failed:', error.response?.data || error.message);
     throw error;
   } finally {
     setIsLoading(false);
@@ -53,27 +52,3 @@ export const useAuth = () => {
     login: loginMutation,
   }; 
 }
-
-// export const useRegister = (userData) => {
-//   const registerMutation = useMutation({
-//     mutationKey: ['register'], 
-//     mutationFn: () => register(userData),
-//     enabled: false,
-//   });
-
-//   return {
-//     register: registerMutation,
-//   };
-// };
-
-// export const useLogin = (credentials) => {
-//   const loginMutation = useMutation({
-//     mutationKey: ['login'],
-//     mutationFn: () => login(credentials),
-//     enabled: false,
-//   });
-
-//   return {
-//     login: loginMutation,
-//   };
-// };

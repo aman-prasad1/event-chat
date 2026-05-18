@@ -1,22 +1,36 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate} from "react-router-dom";
 import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
+import { useAuth } from "../hooks/useAuth";
+import { userStore } from "../store/userStore";
 
 
 const Login = () => {
 
   const [isPasswordHidden, setisPasswordHidden] = useState(true);
 
+  const navigate = useNavigate();
+  const { user } = userStore();
+  const { login } = useAuth();
 
   const handleIsPasswordHidden = () => {
     setisPasswordHidden(!isPasswordHidden);
   }
 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("login submit", e.target);
+    
+    const credentials = {
+      username: e.target.username.value,
+      password: e.target.password.value,
+    };
+
+    const result = await login.mutateAsync(credentials);
+    
+    if(result) {
+        navigate('/')
+    }
   };
 
   return (
