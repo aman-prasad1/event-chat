@@ -27,7 +27,7 @@ const uploadToS3 = async (file) => {
         return key;
     } catch (error) {
         console.error('Error uploading file to S3:', error);
-        throw error;
+        return null;
     }
 };
 
@@ -45,7 +45,7 @@ const getSignedFileUrl = async (key) => {
         return url;
     } catch (error) {
         console.error('Error generating signed URL for S3 file:', error);
-        throw error;
+        return null;
     }
 };
 
@@ -57,9 +57,10 @@ const deleteFromS3 = async (key) => {
             Bucket: process.env.AWS_S3_BUCKET,
             Key: key
         }));
+        return true;
     } catch (error) {
         console.error('Error deleting file from S3:', error);
-        throw error;
+        return null;
     }
 };
 

@@ -2,7 +2,7 @@ import { prisma } from '../../db/index.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
-import { uploadOnCloudinary } from '../../utils/cloudinary.js';
+import { uploadToS3 } from '../../utils/s3.js';
 import { io, isUserOnline, publishToRedis } from '../../socketIo.js';
 import fs from 'fs';
 
@@ -145,16 +145,15 @@ const createConversationMessage = asyncHandler(async (req, res) => {
                 throw new ApiError(400, 'File is required for file messages');
             }
 
-            // upload file to cloudinary
-            const uploadResult = await uploadOnCloudinary(req.file.path, "chatFiles");
-            if (!uploadResult || !uploadResult.url || !uploadResult.public_id) {
+            // upload file to S3
+            const fileKey = await uploadToS3(req.file);
+            if (!fileKey) {
                 throw new ApiError(500, 'Failed to upload file');
             }
 
             parsedContent = {
                 filename: req.file.originalname,
-                file_url: uploadResult.url,
-                file_publicId: uploadResult.public_id,
+                file_key: fileKey,
                 mimetype: req.file.mimetype,
                 size: req.file.size
             };
