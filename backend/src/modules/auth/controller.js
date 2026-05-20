@@ -108,6 +108,7 @@ const login = asyncHandler(async (req, res) => {
         
         // Prepare the response data without sensitive information
         const responseData = {
+            id: user.id,
             username: user.username,
             first_name: user.first_name,
             last_name: user.last_name,
