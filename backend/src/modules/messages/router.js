@@ -5,13 +5,15 @@ import { messageLimiter } from '../../middlewares/rateLimiter.middleware.js';
 import { 
     createDirectConversation,
     getConverstionMessages,
-    createConversationMessage
+    createConversationMessage,
+    getRecentConversations
  } from './controller.js';
 
 const router = Router();
 
 router.post('/conversations/direct', authenticateAccessToken, createDirectConversation);
 router.post('/', messageLimiter, authenticateAccessToken, upload.single('file'), createConversationMessage);
-router.get('/:conversationId', authenticateAccessToken, getConverstionMessages);
+router.get('/conversation-messages/:conversationId', authenticateAccessToken, getConverstionMessages);
+router.get('/recent-conversations', authenticateAccessToken, getRecentConversations);
 
 export default router;

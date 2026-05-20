@@ -224,8 +224,107 @@ const createConversationMessage = asyncHandler(async (req, res) => {
     }
 });
 
+const getRecentConversations = asyncHandler(async (req, res) => {
+    try {
+        const userId = req.user?.id;
+
+        const conversations = await prisma.conversation.findMany({
+            where: {
+                members: {
+                    some: { userId }
+                }
+            },
+            include: {
+                messages: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1,
+                    select: {
+                        id: true,
+                        senderId: true,
+                        type: true,
+                        content: true,
+                        createdAt: true
+                    }
+                },
+                members: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                first_name: true,
+                                last_name: true,
+                                avatar_url: true
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        if (conversations.length === 0) {
+            return res
+                .status(200)
+                .json(new ApiResponse(200, 'No conversations found', { conversations: [] }));
+        }
+
+        // get unread counts for all conversations
+        const unreadCounts = await prisma.messageStatus.groupBy({
+            by: ['messageId'],
+            where: {
+                userId,
+                status: 'sent'
+            }
+        });
+
+
+        // map messageIds to conversationIds for unread count lookup
+        const unreadMessages = await prisma.message.findMany({
+            where: {
+                id: { in: unreadCounts.map(u => u.messageId) }
+            },
+            select: {
+                id: true,
+                conversationId: true
+            }
+        });
+
+        // build unread count map { conversationId: count }
+        const unreadCountMap = unreadMessages.reduce((acc, msg) => {
+            acc[msg.conversationId] = (acc[msg.conversationId] || 0) + 1;
+            return acc;
+        }, {});
+
+
+        const formattedConversations = conversations.map((conv) => {
+            const otherMembers = conv.members
+                .filter(m => m.userId !== userId)
+                .map(m => m.user);
+
+            return {
+                conversationId: conv.id,
+                type: conv.type,
+                latestMessage: conv.messages[0] || null,
+                unreadCount: unreadCountMap[conv.id] || 0,
+                members: otherMembers
+            };
+        });
+
+        res
+            .status(200)
+            .json(new ApiResponse(200, 'Recent conversations fetched successfully', { conversations: formattedConversations }));
+
+    } catch (error) {
+        throw new ApiError(error.statusCode || 500, error.message || 'Failed to fetch recent conversations');
+    }
+});
+
 export {
     createDirectConversation,
     getConverstionMessages,
-    createConversationMessage
+    createConversationMessage,
+    getRecentConversations
 }
