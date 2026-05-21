@@ -4,6 +4,7 @@ import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
 import { uploadToS3 } from '../../utils/s3.js';
 import { io, isUserOnline, publishToRedis } from '../../socketIo.js';
+import { redisClient } from '../../redis/index.js';
 import fs from 'fs';
 
 const createDirectConversation = asyncHandler(async (req, res) => {
@@ -51,6 +52,10 @@ const createDirectConversation = asyncHandler(async (req, res) => {
                 }
             }
         });
+
+        // clear redis cache for recent conversations of both users
+        await redisClient.del(`conversation:${req.user?.id}`);
+        await redisClient.del(`conversation:${userId}`);
 
         res
             .status(201)
@@ -193,6 +198,9 @@ const createConversationMessage = asyncHandler(async (req, res) => {
                         }
                     });
 
+                    // clear redis cache for recent conversations of the recipient to ensure they get the updated conversation list with the new message
+                    await redisClient.del(`conversation:${m.userId}`);
+
                     const online = await isUserOnline(m.userId);
                     if (online) {
                         await publishToRedis("message_received", {
@@ -202,6 +210,8 @@ const createConversationMessage = asyncHandler(async (req, res) => {
                     }
                 })
         );
+        // clear redis cache for recent conversations for the sender
+        await redisClient.del(`conversation:${req.user?.id}`);
 
         res
             .status(201)
@@ -227,6 +237,15 @@ const createConversationMessage = asyncHandler(async (req, res) => {
 const getRecentConversations = asyncHandler(async (req, res) => {
     try {
         const userId = req.user?.id;
+        const cacheKey = `conversation:${userId}`;
+
+        const cachedConversations = await redisClient.get(cacheKey);
+
+        if (cachedConversations) {
+            return res
+                .status(200)
+                .json(new ApiResponse(200, 'Recent conversations fetched successfully', { conversations: JSON.parse(cachedConversations) }));
+        }
 
         const conversations = await prisma.conversation.findMany({
             where: {
@@ -314,6 +333,15 @@ const getRecentConversations = asyncHandler(async (req, res) => {
                 members: otherMembers
             };
         });
+
+
+        // cache the recent conversations for 5 minutes
+        await redisClient.set(
+            cacheKey,
+            JSON.stringify(formattedConversations),
+            'EX',
+            60 * 60 // 30 minutes
+        );
 
         res
             .status(200)
