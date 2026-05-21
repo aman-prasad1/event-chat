@@ -276,7 +276,9 @@ const getRecentConversations = asyncHandler(async (req, res) => {
             by: ['messageId'],
             where: {
                 userId,
-                status: 'sent'
+                status: {
+                    in: ['sent', 'delivered']
+                }
             }
         });
 
