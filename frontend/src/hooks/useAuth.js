@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { axiosInstance } from '../lib/axios';
 import { userStore } from '../store/userStore';
+import { chatStore } from '../store/chatStore';
 
 const register = async (userData) => {
   const { setUser, setIsLoading } = userStore.getState();
@@ -35,15 +36,18 @@ const login = async (credentials) => {
 
 const logout = async () => {
   const { clearUser, setIsLoading } = userStore.getState();
+  const { clearChat } = chatStore.getState();
 
   setIsLoading(true);
   try {
     const response = await axiosInstance.post('/auth/logout');
     clearUser();
+    clearChat();
     return response.data;
   } catch (error) {
     console.error('Logout failed:', error.response?.data || error.message);
     clearUser();
+    clearChat();
     throw error;
   } finally {
     setIsLoading(false);

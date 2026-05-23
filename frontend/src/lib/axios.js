@@ -1,5 +1,6 @@
 import axios from "axios";
 import { userStore } from "../store/userStore";
+import { chatStore } from "../store/chatStore";
 
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/api/v1",
@@ -56,6 +57,7 @@ axiosInstance.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError);
       userStore.getState().clearUser();
+      chatStore.getState().clearChat();
       window.location.href = "/login";
       return Promise.reject(refreshError);
     } finally {
