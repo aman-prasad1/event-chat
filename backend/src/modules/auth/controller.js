@@ -184,9 +184,33 @@ const refreshTokens = asyncHandler(async (req, res) => {
     }
 });
 
+const logout = asyncHandler(async (req, res) => {
+    try {
+        const userId = req.user.id;
+    
+        // Clear the refresh token from the database
+        await prisma.user.update({
+            where: { id: userId },
+            data: { refresh_Token: null }
+        });
+    
+        // Clear the cookies
+        res
+            .status(200)
+            .clearCookie('accessToken', { path: '/' })
+            .clearCookie('refreshToken', { path: '/' })
+            .json(
+                new ApiResponse(200, 'Logout successful')
+            );
+    } catch (error) {
+        throw new ApiError(error.statusCode || 500, error.message || 'Internal Server Error');
+    }
+});
+
 
 export { 
     register,
     login,
-    refreshTokens
+    refreshTokens,
+    logout
 }
