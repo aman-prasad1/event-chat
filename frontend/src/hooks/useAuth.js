@@ -33,6 +33,23 @@ const login = async (credentials) => {
   }
 };
 
+const logout = async () => {
+  const { clearUser, setIsLoading } = userStore.getState();
+
+  setIsLoading(true);
+  try {
+    const response = await axiosInstance.post('/auth/logout');
+    clearUser();
+    return response.data;
+  } catch (error) {
+    console.error('Logout failed:', error.response?.data || error.message);
+    clearUser();
+    throw error;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
 export const useAuth = () => {
   const registerMutation = useMutation({
@@ -47,8 +64,15 @@ export const useAuth = () => {
     enabled: false,
   });
 
+  const logoutMutation = useMutation({
+    mutationKey: ['logout'],
+    mutationFn: logout,
+    enabled: false,
+  });
+
   return {
     register: registerMutation,
     login: loginMutation,
+    logout: logoutMutation,
   }; 
 }

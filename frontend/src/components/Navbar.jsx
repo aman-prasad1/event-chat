@@ -3,10 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { RiSunLine, RiMoonLine, RiLogoutBoxRLine, RiUser3Line } from "react-icons/ri";
 import { userStore } from "../store/userStore";
 import { themeStore } from "../store/themeStore";
+import { useAuth } from "../hooks/useAuth";
 
 const Navbar = () => {
   const { user, clearUser } = userStore();
   const { theme, toggleTheme } = themeStore();
+  const { logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -22,10 +24,15 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    clearUser();
-    setDropdownOpen(false);
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logout.mutateAsync();
+    } catch (error) {
+      // user state is already cleared inside the hook
+    } finally {
+      setDropdownOpen(false);
+      navigate("/login");
+    }
   };
 
   // Generate initials from user data
