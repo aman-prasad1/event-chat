@@ -1,8 +1,9 @@
-import { React, lazy, Suspense, useEffect } from 'react'
+import { React, lazy, Suspense, useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import { themeStore } from './store/themeStore'
 import { userStore } from './store/userStore'
+import { useAuth } from './hooks/useAuth'
 
 
 // Lazy load the component
@@ -11,10 +12,36 @@ const SignUp = lazy(() => import('./pages/SignUp'))
 const Home = lazy(() => import('./pages/Home'))
 
 
-// Route guard: redirects to /login if not authenticated
+// Route guard: verifies session via API before rendering children
 const ProtectedRoute = ({ children }) => {
   const { user } = userStore();
-  if (!user) return <Navigate to="/login" replace />;
+  const { getUser } = useAuth();
+  const [isChecking, setIsChecking] = useState(true);
+  const [isAuthed, setIsAuthed] = useState(false);
+
+  useEffect(() => {
+    // If user already in store, still verify with backend
+    const verifyAuth = async () => {
+      try {
+        await getUser();
+        setIsAuthed(true);
+      } catch {
+        setIsAuthed(false);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+    verifyAuth();
+  }, []);
+
+  if (isChecking) {
+    return <div className="auth-loading">Verifying session...</div>;
+  }
+
+  if (!isAuthed) {
+    return <Navigate to="/login" replace />;
+  }
+
   return children;
 };
 

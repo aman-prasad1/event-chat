@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { axiosInstance } from '../lib/axios';
 import { userStore } from '../store/userStore';
 
@@ -50,10 +50,24 @@ const logout = async () => {
   }
 };
 
+// Fetches user profile; 401 handling is done by the axios interceptor
+const getUser = async () => {
+  const { setUser, clearUser } = userStore.getState();
+
+  try {
+    const response = await axiosInstance.get('/users/profile');
+    setUser(response.data.data.user);
+    return response.data.data.user;
+  } catch (error) {
+    clearUser();
+    throw error;
+  }
+};
+
 
 export const useAuth = () => {
   const registerMutation = useMutation({
-    mutationKey: ['register'], 
+    mutationKey: ['register'],
     mutationFn: register,
     enabled: false,
   });
@@ -74,5 +88,6 @@ export const useAuth = () => {
     register: registerMutation,
     login: loginMutation,
     logout: logoutMutation,
-  }; 
+    getUser,
+  };
 }
