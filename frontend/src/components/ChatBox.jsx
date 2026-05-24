@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { RiSendPlane2Fill } from "react-icons/ri";
+import { RiSendPlane2Fill, RiAttachment2 } from "react-icons/ri";
+import { IoClose } from "react-icons/io5";
 import { chatStore } from "../store/chatStore";
 import { userStore } from "../store/userStore";
 import { useChat } from "../hooks/useChat";
@@ -7,11 +8,13 @@ import { useChat } from "../hooks/useChat";
 const ChatBox = () => {
   const { selectedConversation, messages, messagesLoading, addMessage } = chatStore();
   const { user } = userStore();
-  const { getMessages, sendMessage } = useChat();
+  const { getMessages, sendMessage, sendFileMessage } = useChat();
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Fetch messages when conversation changes
   useEffect(() => {
@@ -51,32 +54,85 @@ const ChatBox = () => {
     return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
   };
 
+  // Handle file selection
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      setSelectedFiles((prev) => [...prev, ...files]);
+    }
+    // Reset so the same file can be re-selected
+    e.target.value = "";
+  };
+
+  const removeFile = (index) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const getFileIcon = (file) => {
+    const type = file.type;
+    if (type.startsWith("image/")) return "🖼️";
+    if (type.startsWith("video/")) return "🎬";
+    if (type.startsWith("audio/")) return "🎵";
+    if (type === "application/pdf") return "📄";
+    if (type.includes("spreadsheet") || type.includes("excel")) return "📊";
+    if (type.includes("document") || type.includes("word")) return "📝";
+    if (type.includes("zip") || type.includes("rar") || type.includes("tar")) return "🗜️";
+    return "📎";
+  };
+
   // Handle send
   const handleSend = async () => {
     const text = input.trim();
-    if (!text || sending) return;
+    const hasFiles = selectedFiles.length > 0;
+    if ((!text && !hasFiles) || sending) return;
 
-    // Optimistic update
-    const tempMessage = {
-      id: `temp-${Date.now()}`,
-      senderId: user.id,
-      conversationId: selectedConversation.conversationId,
-      type: "text",
-      content: { text },
-      createdAt: new Date().toISOString(),
-      _pending: true,
-    };
-
-    addMessage(tempMessage);
-    setInput("");
     setSending(true);
 
     try {
-      await sendMessage(selectedConversation.conversationId, text);
-      // Refetch to get the real message from server
+      // Send files first
+      if (hasFiles) {
+        for (const file of selectedFiles) {
+          const tempFileMsg = {
+            id: `temp-file-${Date.now()}-${Math.random()}`,
+            senderId: user.id,
+            conversationId: selectedConversation.conversationId,
+            type: "file",
+            content: { filename: file.name },
+            createdAt: new Date().toISOString(),
+            _pending: true,
+          };
+          addMessage(tempFileMsg);
+          await sendFileMessage(selectedConversation.conversationId, file);
+        }
+        setSelectedFiles([]);
+      }
+
+      // Send text if present
+      if (text) {
+        const tempMessage = {
+          id: `temp-${Date.now()}`,
+          senderId: user.id,
+          conversationId: selectedConversation.conversationId,
+          type: "text",
+          content: { text },
+          createdAt: new Date().toISOString(),
+          _pending: true,
+        };
+        addMessage(tempMessage);
+        setInput("");
+        await sendMessage(selectedConversation.conversationId, text);
+      }
+
+      // Refetch to get real messages from server
       await getMessages(selectedConversation.conversationId);
     } catch (error) {
-      // Could mark the temp message as failed here
+      // Could mark the temp messages as failed here
     } finally {
       setSending(false);
       inputRef.current?.focus();
@@ -215,10 +271,60 @@ const ChatBox = () => {
         className="shrink-0 px-4 py-3 border-t"
         style={{ borderColor: 'var(--color-border)' }}
       >
+        {/* File Preview Strip */}
+        {selectedFiles.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-2">
+            {selectedFiles.map((file, idx) => (
+              <div
+                key={`${file.name}-${idx}`}
+                className="flex items-center gap-1.5 pl-2.5 pr-1.5 py-1.5 rounded-lg text-xs max-w-[200px] group transition-all duration-200"
+                style={{
+                  backgroundColor: 'var(--color-border)',
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                <span className="text-sm">{getFileIcon(file)}</span>
+                <span className="truncate flex-1 font-medium" title={file.name}>{file.name}</span>
+                <span className="shrink-0 opacity-60" style={{ color: 'var(--color-text-secondary)' }}>
+                  {formatFileSize(file.size)}
+                </span>
+                <button
+                  onClick={() => removeFile(idx)}
+                  className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full border-none cursor-pointer opacity-50 hover:opacity-100 transition-opacity duration-150 ml-0.5"
+                  style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)' }}
+                  title="Remove file"
+                >
+                  <IoClose size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div
           className="flex items-center gap-2 rounded-xl px-3 py-2 border"
           style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-primary)' }}
         >
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            className="hidden"
+            onChange={handleFileSelect}
+          />
+
+          {/* Attach button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg border-none cursor-pointer transition-all duration-200 hover:scale-105"
+            style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)' }}
+            title="Attach files"
+            type="button"
+          >
+            <RiAttachment2 size={18} />
+          </button>
+
           <textarea
             ref={inputRef}
             value={input}
@@ -240,7 +346,7 @@ const ChatBox = () => {
           />
           <button
             onClick={handleSend}
-            disabled={!input.trim() || sending}
+            disabled={(!input.trim() && selectedFiles.length === 0) || sending}
             className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg border-none cursor-pointer transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
             style={{
               backgroundColor: 'var(--color-accent-primary)',

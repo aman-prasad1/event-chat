@@ -52,10 +52,31 @@ const sendMessage = async (conversationId, text) => {
   }
 };
 
+const sendFileMessage = async (conversationId, file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('conversationId', conversationId);
+    formData.append('type', 'file');
+    formData.append('content', JSON.stringify({ filename: file.name }));
+
+    const response = await axiosInstance.post('/messages', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error('Failed to send file:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export const useChat = () => {
   return {
     getRecentConversations,
     getMessages,
     sendMessage,
+    sendFileMessage,
   };
 };
