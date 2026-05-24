@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { RiSendPlane2Fill, RiAttachment2 } from "react-icons/ri";
+import { RiSendPlane2Fill, RiAttachment2, RiDownloadLine, RiFileTextLine } from "react-icons/ri";
 import { IoClose } from "react-icons/io5";
 import { chatStore } from "../store/chatStore";
 import { userStore } from "../store/userStore";
@@ -12,6 +12,7 @@ const ChatBox = () => {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [fileSizeWarning, setFileSizeWarning] = useState("");
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -54,11 +55,31 @@ const ChatBox = () => {
     return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
   };
 
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
   // Handle file selection
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length > 0) {
-      setSelectedFiles((prev) => [...prev, ...files]);
+    const valid = [];
+    const rejected = [];
+
+    for (const file of files) {
+      if (file.size > MAX_FILE_SIZE) {
+        rejected.push(file.name);
+      } else {
+        valid.push(file);
+      }
+    }
+
+    if (rejected.length > 0) {
+      setFileSizeWarning(
+        `${rejected.join(", ")} ${rejected.length === 1 ? "exceeds" : "exceed"} the 10 MB limit`
+      );
+      setTimeout(() => setFileSizeWarning(""), 4000);
+    }
+
+    if (valid.length > 0) {
+      setSelectedFiles((prev) => [...prev, ...valid]);
     }
     // Reset so the same file can be re-selected
     e.target.value = "";
@@ -240,24 +261,81 @@ const ChatBox = () => {
                   </div>
                 )}
                 <div className={`flex ${isSelf ? "justify-end" : "justify-start"} mb-0.5`}>
-                  <div
-                    className={`max-w-[70%] px-3.5 py-2 text-sm leading-relaxed break-words ${
-                      isSelf
-                        ? "rounded-2xl rounded-br-md text-white"
-                        : "rounded-2xl rounded-bl-md"
-                    } ${msg._pending ? "opacity-60" : ""}`}
-                    style={
-                      isSelf
-                        ? { background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))' }
-                        : { backgroundColor: 'var(--color-border)', color: 'var(--color-text-primary)' }
-                    }
-                  >
-                    {msg.type === "file" ? (
-                      <span>📎 {msg.content?.filename || "File"}</span>
-                    ) : (
-                      msg.content?.text || ""
-                    )}
-                  </div>
+                  {msg.type === "file" ? (
+                    <div
+                      className={`max-w-[70%] rounded-2xl overflow-hidden ${msg._pending ? "opacity-60" : ""}`}
+                      style={{
+                        ...(isSelf
+                          ? { background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))' }
+                          : { backgroundColor: 'var(--color-border)' }),
+                        padding: '10px',
+                        minWidth: '240px',
+                      }}
+                    >
+                      {/* Inner darker container */}
+                      <div
+                        className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl"
+                        style={{
+                          backgroundColor: isSelf ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.06)',
+                        }}
+                      >
+                        {/* File icon */}
+                        <div
+                          className="shrink-0 flex items-center justify-center w-10 h-10 rounded-lg"
+                          style={{
+                            backgroundColor: isSelf ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.08)',
+                          }}
+                        >
+                          <RiFileTextLine size={22} style={{ color: isSelf ? '#fff' : 'var(--color-text-secondary)' }} />
+                        </div>
+
+                        {/* File info */}
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className="text-sm font-medium m-0 truncate"
+                            style={{ color: isSelf ? '#fff' : 'var(--color-text-primary)' }}
+                            title={msg.content?.filename}
+                          >
+                            {msg.content?.filename || "File"}
+                          </p>
+                          <p
+                            className="text-[11px] m-0 mt-0.5"
+                            style={{ color: isSelf ? 'rgba(255,255,255,0.7)' : 'var(--color-text-secondary)' }}
+                          >
+                            File
+                          </p>
+                        </div>
+
+                        {/* Download icon */}
+                        <button
+                          className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full border-none cursor-pointer transition-all duration-200 hover:scale-110"
+                          style={{
+                            backgroundColor: isSelf ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.08)',
+                            color: isSelf ? '#fff' : 'var(--color-text-secondary)',
+                          }}
+                          title="Download"
+                          type="button"
+                        >
+                          <RiDownloadLine size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className={`max-w-[70%] px-3.5 py-2 text-sm leading-relaxed break-words ${
+                        isSelf
+                          ? "rounded-2xl rounded-br-md text-white"
+                          : "rounded-2xl rounded-bl-md"
+                      } ${msg._pending ? "opacity-60" : ""}`}
+                      style={
+                        isSelf
+                          ? { background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))' }
+                          : { backgroundColor: 'var(--color-border)', color: 'var(--color-text-primary)' }
+                      }
+                    >
+                      {msg.content?.text || ""}
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -271,6 +349,28 @@ const ChatBox = () => {
         className="shrink-0 px-4 py-3 border-t"
         style={{ borderColor: 'var(--color-border)' }}
       >
+        {/* File Size Warning */}
+        {fileSizeWarning && (
+          <div
+            className="flex items-center gap-2 mb-2 px-3 py-2 rounded-lg text-xs font-medium animate-pulse"
+            style={{
+              backgroundColor: 'rgba(239, 68, 68, 0.12)',
+              color: '#ef4444',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+            }}
+          >
+            <span>⚠️</span>
+            <span className="flex-1">{fileSizeWarning}</span>
+            <button
+              onClick={() => setFileSizeWarning("")}
+              className="shrink-0 border-none bg-transparent cursor-pointer text-xs font-bold opacity-60 hover:opacity-100"
+              style={{ color: '#ef4444' }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* File Preview Strip */}
         {selectedFiles.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-2">
