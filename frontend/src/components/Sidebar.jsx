@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { RiChat3Line, RiAttachment2 } from "react-icons/ri";
 import { chatStore } from "../store/chatStore";
 import { userStore } from "../store/userStore";
 import { useChat } from "../hooks/useChat";
@@ -52,7 +53,7 @@ const Sidebar = () => {
   // Get message preview text
   const getPreview = (latestMessage) => {
     if (!latestMessage) return "No messages yet";
-    if (latestMessage.type === "file") return "📎 File";
+    if (latestMessage.type === "file") return <><RiAttachment2 size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '3px' }} /> File</>;
     const text = latestMessage.content?.text || "";
     return text.length > 40 ? text.slice(0, 40) + "…" : text;
   };
@@ -102,7 +103,7 @@ const Sidebar = () => {
           <h2 className="text-[22px] font-bold m-0 tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Chats</h2>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center px-5 py-8 text-center">
-          <span className="text-5xl mb-3 opacity-50">💬</span>
+          <RiChat3Line size={48} className="mb-3 opacity-50" style={{ color: 'var(--color-text-secondary)' }} />
           <p className="text-[15px] font-semibold m-0 mb-1" style={{ color: 'var(--color-text-primary)' }}>
             No conversations yet
           </p>

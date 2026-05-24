@@ -1,4 +1,5 @@
 import React from "react";
+import { RiChat3Line } from "react-icons/ri";
 import { userStore } from "../store/userStore";
 import { chatStore } from "../store/chatStore";
 import Sidebar from "../components/Sidebar";
@@ -19,7 +20,7 @@ const Home = () => {
           style={{ backgroundColor: 'var(--color-primary)' }}
         >
           <div className="text-center p-8">
-            <span className="text-6xl block mb-4 opacity-40">💬</span>
+            <RiChat3Line size={60} className="block mb-4 mx-auto opacity-40" style={{ color: 'var(--color-text-secondary)' }} />
             <h2
               className="text-[22px] font-bold m-0 mb-2 tracking-tight"
               style={{ color: 'var(--color-text-primary)' }}

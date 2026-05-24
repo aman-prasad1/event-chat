@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { RiSendPlane2Fill, RiAttachment2, RiDownloadLine, RiFileTextLine } from "react-icons/ri";
+import { RiSendPlane2Fill, RiAttachment2, RiDownloadLine, RiFileTextLine, RiImageLine, RiVideoLine, RiMusicLine, RiFilePdfLine, RiFileExcel2Line, RiFileWord2Line, RiFileZipLine, RiErrorWarningLine } from "react-icons/ri";
 import { IoClose } from "react-icons/io5";
 import { chatStore } from "../store/chatStore";
 import { userStore } from "../store/userStore";
@@ -97,14 +97,14 @@ const ChatBox = () => {
 
   const getFileIcon = (file) => {
     const type = file.type;
-    if (type.startsWith("image/")) return "🖼️";
-    if (type.startsWith("video/")) return "🎬";
-    if (type.startsWith("audio/")) return "🎵";
-    if (type === "application/pdf") return "📄";
-    if (type.includes("spreadsheet") || type.includes("excel")) return "📊";
-    if (type.includes("document") || type.includes("word")) return "📝";
-    if (type.includes("zip") || type.includes("rar") || type.includes("tar")) return "🗜️";
-    return "📎";
+    if (type.startsWith("image/")) return <RiImageLine size={14} />;
+    if (type.startsWith("video/")) return <RiVideoLine size={14} />;
+    if (type.startsWith("audio/")) return <RiMusicLine size={14} />;
+    if (type === "application/pdf") return <RiFilePdfLine size={14} />;
+    if (type.includes("spreadsheet") || type.includes("excel")) return <RiFileExcel2Line size={14} />;
+    if (type.includes("document") || type.includes("word")) return <RiFileWord2Line size={14} />;
+    if (type.includes("zip") || type.includes("rar") || type.includes("tar")) return <RiFileZipLine size={14} />;
+    return <RiAttachment2 size={14} />;
   };
 
   // Handle send
@@ -239,7 +239,7 @@ const ChatBox = () => {
         {messages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-              No messages yet. Say hi! 👋
+              No messages yet. Say hi!
             </p>
           </div>
         ) : (
@@ -359,14 +359,14 @@ const ChatBox = () => {
               border: '1px solid rgba(239, 68, 68, 0.25)',
             }}
           >
-            <span>⚠️</span>
+            <RiErrorWarningLine size={16} />
             <span className="flex-1">{fileSizeWarning}</span>
             <button
               onClick={() => setFileSizeWarning("")}
               className="shrink-0 border-none bg-transparent cursor-pointer text-xs font-bold opacity-60 hover:opacity-100"
               style={{ color: '#ef4444' }}
             >
-              ✕
+              <IoClose size={14} />
             </button>
           </div>
         )}

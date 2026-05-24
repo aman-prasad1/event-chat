@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { RiSunLine, RiMoonLine, RiLogoutBoxRLine, RiUser3Line } from "react-icons/ri";
+import { RiSunLine, RiMoonLine, RiLogoutBoxRLine, RiUser3Line, RiChat3Fill } from "react-icons/ri";
 import { userStore } from "../store/userStore";
 import { themeStore } from "../store/themeStore";
 import { useAuth } from "../hooks/useAuth";
@@ -56,7 +56,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-[60px]">
         {/* Brand / Logo */}
         <Link to="/" className="flex items-center gap-2.5 no-underline hover:opacity-85 transition-opacity">
-          <span className="text-2xl leading-none">💬</span>
+          <RiChat3Fill size={24} style={{ color: 'var(--color-accent-primary)' }} />
           <span
             className="text-xl font-bold tracking-tight bg-clip-text"
             style={{
