@@ -368,11 +368,24 @@ const getFileUrl = asyncHandler(async (req, res) => {
         }
 
         const fileKey = message.content.file_key;
+
+        // check redis cache for the file URL first
+        const cacheKey = `fileUrl:${fileKey}`;
+        const cachedUrl = await redisClient.get(cacheKey);
+        if (cachedUrl) {
+            return res
+                .status(200)
+                .json(new ApiResponse(200, 'File URL fetched successfully', { fileUrl: cachedUrl }));
+        }
+
         const fileUrl = await getSignedFileUrl(fileKey);
 
         if(!fileUrl) {
             throw new ApiError(500, 'Failed to generate file URL');
         }
+
+        // cache the file URL for 1 hour
+        await redisClient.set(cacheKey, fileUrl, 'EX', 60 * 60);
 
         res
             .status(200)
