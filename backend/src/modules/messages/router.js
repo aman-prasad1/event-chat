@@ -6,7 +6,8 @@ import {
     createDirectConversation,
     getConverstionMessages,
     createConversationMessage,
-    getRecentConversations
+    getRecentConversations,
+    getFileUrl
  } from './controller.js';
 
 const router = Router();
@@ -15,5 +16,7 @@ router.post('/conversations/direct', authenticateAccessToken, createDirectConver
 router.post('/', messageLimiter, authenticateAccessToken, uploadFile.single('file'), createConversationMessage);
 router.get('/conversation-messages/:conversationId', authenticateAccessToken, getConverstionMessages);
 router.get('/recent-conversations', authenticateAccessToken, getRecentConversations);
+router.get('/file-url', authenticateAccessToken, getFileUrl);
+
 
 export default router;

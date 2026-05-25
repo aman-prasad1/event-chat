@@ -2,7 +2,7 @@ import { prisma } from '../../db/index.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
-import { uploadToS3 } from '../../utils/s3.js';
+import { uploadToS3, getSignedFileUrl } from '../../utils/s3.js';
 import { io, isUserOnline, publishToRedis } from '../../socketIo.js';
 import { redisClient } from '../../redis/index.js';
 import fs from 'fs';
@@ -163,11 +163,6 @@ const createConversationMessage = asyncHandler(async (req, res) => {
                 size: req.file.size
             };
 
-            fs.unlink(req.file.path, (err) => {
-                if (err) {
-                    console.error('Error deleting local file:', err);
-                }
-            });
         } else {
             throw new ApiError(400, 'Unsupported message type');
         }
@@ -217,14 +212,6 @@ const createConversationMessage = asyncHandler(async (req, res) => {
             .status(201)
             .json(new ApiResponse(201, 'Message sent successfully', { "messageId": message.id }));
     } catch (error) {
-        if (req.file) {
-            // Ensure that the local file is deleted after processing
-            fs.unlink(req.file.path, (err) => {
-                if (err) {
-                    console.error('Error deleting local file:', err);
-                }
-            });
-        }
 
         if (error.code === "P2003") {
             throw new ApiError(404, 'Conversation not found');
@@ -352,9 +339,53 @@ const getRecentConversations = asyncHandler(async (req, res) => {
     }
 });
 
+const getFileUrl = asyncHandler(async (req, res) => {
+    try {
+        const { conversationId, messageId } = req.body;
+
+        // check if the conversation exists and the user is a member of it
+        const isMember = await prisma.conversationMember.findFirst({
+            where: {
+                conversationId,
+                userId: req.user.id
+            }
+        });
+        if (!isMember) {
+            throw new ApiError(403, 'You are not a member of this conversation');
+        }
+
+        const message = await prisma.message.findUnique({
+            where: { id: messageId, conversationId },
+            select: { content: true, type: true }
+        });
+
+        if (!message) {
+            throw new ApiError(404, 'Message not found');
+        }
+
+        if (message.type !== 'file') {
+            throw new ApiError(400, 'Message is not a file type');
+        }
+
+        const fileKey = message.content.file_key;
+        const fileUrl = await getSignedFileUrl(fileKey);
+
+        if(!fileUrl) {
+            throw new ApiError(500, 'Failed to generate file URL');
+        }
+
+        res
+            .status(200)
+            .json(new ApiResponse(200, 'File URL fetched successfully', { fileUrl }));
+    } catch (error) {
+        throw new ApiError(error.statusCode || 500, error.message || 'Failed to fetch file URL');
+    }
+});
+
 export {
     createDirectConversation,
     getConverstionMessages,
     createConversationMessage,
-    getRecentConversations
+    getRecentConversations,
+    getFileUrl
 }
