@@ -33,11 +33,12 @@ const uploadToS3 = async (file) => {
 
 
 // Generate a signed URL for a file (valid for 1 hour)
-const getSignedFileUrl = async (key) => {
+const getSignedFileUrl = async (key, filename) => {
     try {
         const command = new GetObjectCommand({
             Bucket: process.env.AWS_S3_BUCKET,
-            Key: key
+            Key: key,
+            ResponseContentDisposition: `attachment; filename="${filename}"`
         });
     
         const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });

@@ -341,7 +341,7 @@ const getRecentConversations = asyncHandler(async (req, res) => {
 
 const getFileUrl = asyncHandler(async (req, res) => {
     try {
-        const { conversationId, messageId } = req.body;
+        const { conversationId, messageId } = req.query;
 
         // check if the conversation exists and the user is a member of it
         const isMember = await prisma.conversationMember.findFirst({
@@ -378,7 +378,7 @@ const getFileUrl = asyncHandler(async (req, res) => {
                 .json(new ApiResponse(200, 'File URL fetched successfully', { fileUrl: cachedUrl }));
         }
 
-        const fileUrl = await getSignedFileUrl(fileKey);
+        const fileUrl = await getSignedFileUrl(fileKey, message.content.filename);
 
         if(!fileUrl) {
             throw new ApiError(500, 'Failed to generate file URL');

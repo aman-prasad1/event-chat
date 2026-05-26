@@ -72,11 +72,26 @@ const sendFileMessage = async (conversationId, file) => {
   }
 };
 
+const getFileUrl = async (conversationId, messageId) => {
+  try {
+    const response = await axiosInstance.get(`/messages/file-url`, 
+      {
+        params: { conversationId, messageId }
+      }
+    );
+    return response.data.data.fileUrl;
+  } catch (error) {
+    console.error('Failed to fetch file URL:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export const useChat = () => {
   return {
     getRecentConversations,
     getMessages,
     sendMessage,
     sendFileMessage,
+    getFileUrl,
   };
 };

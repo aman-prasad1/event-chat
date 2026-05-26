@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RiSendPlane2Fill, RiAttachment2, RiDownloadLine, RiFileTextLine, RiImageLine, RiVideoLine, RiMusicLine, RiFilePdfLine, RiFileExcel2Line, RiFileWord2Line, RiFileZipLine, RiErrorWarningLine } from "react-icons/ri";
-import { IoClose } from "react-icons/io5";
+import { IoClose, IoCloudyNight } from "react-icons/io5";
 import { chatStore } from "../store/chatStore";
 import { userStore } from "../store/userStore";
 import { useChat } from "../hooks/useChat";
+import { ToastContainer, toast } from "react-toastify";
 
 const ChatBox = () => {
   const { selectedConversation, messages, messagesLoading, addMessage } = chatStore();
   const { user } = userStore();
-  const { getMessages, sendMessage, sendFileMessage } = useChat();
+  const { getMessages, sendMessage, sendFileMessage, getFileUrl } = useChat();
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -16,6 +17,9 @@ const ChatBox = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
+
+
+  const toastRef = useRef(null);
 
   // Fetch messages when conversation changes
   useEffect(() => {
@@ -167,6 +171,33 @@ const ChatBox = () => {
     }
   };
 
+  const handleGetFileUrl = async (msg) => {
+    try {
+      toastRef.current = toast.loading("Downloading file...");
+
+      const url = await getFileUrl(selectedConversation.conversationId, msg.id);
+
+      const fileResponse = await fetch(url);
+      const blob = await fileResponse.blob();
+
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = msg.content.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      URL.revokeObjectURL(blobUrl);
+
+      toast.dismiss(toastRef.current);
+
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response?.data?.message || "Failed to get file URL. Please try again.");
+    }
+  };
+
   // Loading state
   if (messagesLoading && messages.length === 0) {
     return (
@@ -205,6 +236,7 @@ const ChatBox = () => {
       className="flex-1 flex flex-col transition-colors duration-300"
       style={{ backgroundColor: 'var(--color-primary)' }}
     >
+      <ToastContainer />
       {/* Chat Header */}
       <div
         className="flex items-center gap-3 px-5 py-3 border-b shrink-0"
@@ -274,6 +306,7 @@ const ChatBox = () => {
                     >
                       {/* Inner darker container */}
                       <div
+                        onClick={() => handleGetFileUrl(msg)}
                         className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl"
                         style={{
                           backgroundColor: isSelf ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.06)',
