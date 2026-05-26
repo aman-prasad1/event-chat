@@ -58,7 +58,7 @@ const App = () => {
   // Socket.IO connection handling
   useEffect(() => {
     socket.on('message_received', (data) => {
-      socket.emit('message_received', data.message?.id);
+      socket.emit('message_delivered', { messageId: data.message?.id });
       
       // setting the chat messages
       addMessage(data.message);

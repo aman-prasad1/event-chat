@@ -5,9 +5,10 @@ import { chatStore } from "../store/chatStore";
 import { userStore } from "../store/userStore";
 import { useChat } from "../hooks/useChat";
 import { ToastContainer, toast } from "react-toastify";
+import { socket } from "../socketIo";
 
 const ChatBox = () => {
-  const { selectedConversation, messages, messagesLoading, addMessage } = chatStore();
+  const { selectedConversation, messages, messagesLoading, addMessage, markMessageAsRead } = chatStore();
   const { user } = userStore();
   const { getMessages, sendMessage, sendFileMessage, getFileUrl } = useChat();
   const [input, setInput] = useState("");
@@ -25,6 +26,12 @@ const ChatBox = () => {
   useEffect(() => {
     if (selectedConversation?.conversationId) {
       getMessages(selectedConversation.conversationId);
+
+      // mark all messages as seen
+      for(const msgId of selectedConversation.unreadMessageIds || []) {
+        socket.emit("message_seen", { messageId: msgId });
+      }
+      markMessageAsRead(selectedConversation.conversationId);
     }
   }, [selectedConversation?.conversationId]);
 
