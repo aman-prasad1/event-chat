@@ -4,7 +4,8 @@ import Navbar from './components/Navbar'
 import { themeStore } from './store/themeStore'
 import { userStore } from './store/userStore'
 import { useAuth } from './hooks/useAuth'
-
+import { socket } from './socketIo'
+import { chatStore } from './store/chatStore'
 
 // Lazy load the component
 const Login = lazy(() => import('./pages/Login'))
@@ -47,10 +48,26 @@ const ProtectedRoute = ({ children }) => {
 
 const App = () => {
   const { initTheme } = themeStore();
+  const { addMessage } = chatStore();
 
   useEffect(() => {
     initTheme();
   }, [initTheme]);
+
+
+  // Socket.IO connection handling
+  useEffect(() => {
+    socket.on('message_received', (data) => {
+      socket.emit('message_received', data.message?.id);
+      
+      // setting the chat messages
+      addMessage(data.message);
+    });
+
+    return () => {
+        socket.off('message_received');
+    };
+  }, []);
 
   return (
     <BrowserRouter>
