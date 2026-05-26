@@ -287,8 +287,7 @@ const getRecentConversations = asyncHandler(async (req, res) => {
                 }
             }
         });
-
-
+        
         // map messageIds to conversationIds for unread count lookup
         const unreadMessages = await prisma.message.findMany({
             where: {
@@ -302,7 +301,8 @@ const getRecentConversations = asyncHandler(async (req, res) => {
 
         // build unread count map { conversationId: count }
         const unreadCountMap = unreadMessages.reduce((acc, msg) => {
-            acc[msg.conversationId] = (acc[msg.conversationId] || 0) + 1;
+            // acc[msg.conversationId] = (acc[msg.conversationId] || 0) + 1;
+            acc[msg.conversationId] = [...(acc[msg.conversationId] || []), msg.id];
             return acc;
         }, {});
 
@@ -316,7 +316,8 @@ const getRecentConversations = asyncHandler(async (req, res) => {
                 conversationId: conv.id,
                 type: conv.type,
                 latestMessage: conv.messages[0] || null,
-                unreadCount: unreadCountMap[conv.id] || 0,
+                unreadCount: unreadCountMap[conv.id]?.length || 0,
+                unreadMessageIds: unreadCountMap[conv.id] || [],
                 members: otherMembers
             };
         });
