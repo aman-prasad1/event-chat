@@ -8,7 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { socket } from "../socketIo";
 
 const ChatBox = () => {
-  const { selectedConversation, messages, messagesLoading, addMessage, markMessageAsRead, markPendingTrue } = chatStore();
+  const { selectedConversation, messages, messagesLoading, addMessage, markMessageAsRead, markPendingFalse, setLatestMessage } = chatStore();
   const { user } = userStore();
   const { getMessages, sendMessage, sendFileMessage, getFileUrl } = useChat();
   const [input, setInput] = useState("");
@@ -141,7 +141,7 @@ const ChatBox = () => {
           };
           addMessage(tempFileMsg);
           await sendFileMessage(selectedConversation.conversationId, file);
-          markPendingTrue(tempFileMsg.id);
+          markPendingFalse(tempFileMsg.id);
         }
         setSelectedFiles([]);
       }
@@ -160,7 +160,13 @@ const ChatBox = () => {
         addMessage(tempMessage);
         setInput("");
         await sendMessage(selectedConversation.conversationId, text);
-        markPendingTrue(tempMessage.id);
+        markPendingFalse(tempMessage.id);
+
+        // update the latest message preview in the sidebar
+        setLatestMessage(selectedConversation.conversationId, {
+          ...tempMessage,
+          content: { text },
+        });
       }
 
     } catch (error) {

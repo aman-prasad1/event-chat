@@ -12,8 +12,8 @@ const chatStore = create((set, get) => ({
   setMessages: (messages) => set({ messages }),
   setMessagesLoading: (loading) => set({ messagesLoading: loading }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
-  markPendingTrue: (tempId) => set((state) => ({
-    messages: state.messages.map(msg => msg.id === tempId ? { ...msg, _pending: true } : msg)
+  markPendingFalse: (tempId) => set((state) => ({
+    messages: state.messages.map(msg => msg.id === tempId ? { ...msg, _pending: false } : msg)
   })),
   clearChat: () => set({ conversations: [], selectedConversation: null, messages: [] }),
   markMessageAsRead: (conversationId) => set((state) => {
@@ -23,6 +23,18 @@ const chatStore = create((set, get) => ({
           ...conv,
           unreadCount: 0,
           unreadMessageIds: [],
+        };
+      }
+      return conv;
+    });
+    return { conversations };
+  }),
+  setLatestMessage: (conversationId, message) => set((state) => {
+    const conversations = state.conversations.map(conv => {
+      if (conv.conversationId === conversationId) {
+        return {
+          ...conv,
+          latestMessage: message,
         };
       }
       return conv;
