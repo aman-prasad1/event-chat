@@ -41,6 +41,20 @@ const chatStore = create((set, get) => ({
     });
     return { conversations };
   }),
+  incrementUnreadCount: (conversationId, messageId) => set((state) => {
+    const conversations = state.conversations.map(conv => {
+      if (conv.conversationId === conversationId) {
+        const existingUnreadIds = conv.unreadMessageIds || [];
+        return {
+          ...conv,
+          unreadCount: (conv.unreadCount || 0) + 1,
+          unreadMessageIds: [...existingUnreadIds, messageId],
+        };
+      }
+      return conv;
+    });
+    return { conversations };
+  }),
 }));
 
 export { chatStore };

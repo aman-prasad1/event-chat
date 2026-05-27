@@ -48,7 +48,7 @@ const ProtectedRoute = ({ children }) => {
 
 const App = () => {
   const { initTheme } = themeStore();
-  const { addMessage, selectedConversation, setLatestMessage } = chatStore();
+  const { addMessage, selectedConversation, setLatestMessage, incrementUnreadCount } = chatStore();
 
   useEffect(() => {
     initTheme();
@@ -63,6 +63,9 @@ const App = () => {
       // add message to store if belongs to the currently selected conversation
       if(selectedConversation && data.message.conversationId === selectedConversation.conversationId) {
         addMessage(data.message);
+      }
+      else {
+        incrementUnreadCount(data.message.conversationId, data.message.id);
       }
       setLatestMessage(data.message.conversationId, data.message);
     });

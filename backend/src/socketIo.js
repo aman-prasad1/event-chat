@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import cookie from 'cookie';
 import jwt from 'jsonwebtoken';
 import { prisma } from './db/index.js';
-import { publishClient, subscribeClient } from './redis/index.js';
+import { publishClient, subscribeClient, redisClient } from './redis/index.js';
 
 let io;
 let userSocketMap = new Map();
@@ -179,6 +179,9 @@ const initializeSocket = (httpServer) => {
                     conversationId: message.conversationId,
                     userId
                 });
+                
+                const cacheKey = `conversation:${userId}`;
+                await redisClient.del(cacheKey);
 
             } catch (error) {
                 console.error("Error in message_seen event: ", error);
