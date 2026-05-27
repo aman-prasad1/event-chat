@@ -48,7 +48,7 @@ const ProtectedRoute = ({ children }) => {
 
 const App = () => {
   const { initTheme } = themeStore();
-  const { addMessage } = chatStore();
+  const { addMessage, selectedConversation, setLatestMessage } = chatStore();
 
   useEffect(() => {
     initTheme();
@@ -59,15 +59,18 @@ const App = () => {
   useEffect(() => {
     socket.on('message_received', (data) => {
       socket.emit('message_delivered', { messageId: data.message?.id });
-      
-      // setting the chat messages
-      addMessage(data.message);
+
+      // add message to store if belongs to the currently selected conversation
+      if(selectedConversation && data.message.conversationId === selectedConversation.conversationId) {
+        addMessage(data.message);
+      }
+      setLatestMessage(data.message.conversationId, data.message);
     });
 
     return () => {
         socket.off('message_received');
     };
-  }, []);
+  }, [selectedConversation]);
 
   return (
     <BrowserRouter>
