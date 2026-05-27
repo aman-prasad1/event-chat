@@ -8,7 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { socket } from "../socketIo";
 
 const ChatBox = () => {
-  const { selectedConversation, messages, messagesLoading, addMessage, markMessageAsRead } = chatStore();
+  const { selectedConversation, messages, messagesLoading, addMessage, markMessageAsRead, markPendingTrue } = chatStore();
   const { user } = userStore();
   const { getMessages, sendMessage, sendFileMessage, getFileUrl } = useChat();
   const [input, setInput] = useState("");
@@ -33,7 +33,7 @@ const ChatBox = () => {
       }
       markMessageAsRead(selectedConversation.conversationId);
     }
-  }, [selectedConversation?.conversationId]);
+  }, [selectedConversation]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -141,6 +141,7 @@ const ChatBox = () => {
           };
           addMessage(tempFileMsg);
           await sendFileMessage(selectedConversation.conversationId, file);
+          markPendingTrue(tempFileMsg.id);
         }
         setSelectedFiles([]);
       }
@@ -159,12 +160,11 @@ const ChatBox = () => {
         addMessage(tempMessage);
         setInput("");
         await sendMessage(selectedConversation.conversationId, text);
+        markPendingTrue(tempMessage.id);
       }
 
-      // Refetch to get real messages from server
-      await getMessages(selectedConversation.conversationId);
     } catch (error) {
-      // Could mark the temp messages as failed here
+      // TODO: Mark the temp messages as failed here
     } finally {
       setSending(false);
       inputRef.current?.focus();

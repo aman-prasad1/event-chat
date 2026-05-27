@@ -12,6 +12,9 @@ const chatStore = create((set, get) => ({
   setMessages: (messages) => set({ messages }),
   setMessagesLoading: (loading) => set({ messagesLoading: loading }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
+  markPendingTrue: (tempId) => set((state) => ({
+    messages: state.messages.map(msg => msg.id === tempId ? { ...msg, _pending: true } : msg)
+  })),
   clearChat: () => set({ conversations: [], selectedConversation: null, messages: [] }),
   markMessageAsRead: (conversationId) => set((state) => {
     const conversations = state.conversations.map(conv => {
