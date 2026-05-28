@@ -115,6 +115,12 @@ const Sidebar = () => {
     );
   }
 
+  const sortedConversations = [...conversations].sort((a, b) => {
+    const aTime = a?.latestMessage?.createdAt ? new Date(a.latestMessage.createdAt).getTime() : 0;
+    const bTime = b?.latestMessage?.createdAt ? new Date(b.latestMessage.createdAt).getTime() : 0;
+    return bTime - aTime;
+  });
+
   return (
     <aside
       className="w-[340px] min-w-[340px] max-md:w-full max-md:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
@@ -124,7 +130,7 @@ const Sidebar = () => {
         <h2 className="text-[22px] font-bold m-0 tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Chats</h2>
       </div>
       <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
-        {conversations.map((conv) => {
+        {sortedConversations.map((conv) => {
           const { name, username, avatar, initials } = getDisplayInfo(conv.members);
           const isActive = selectedConversation?.conversationId === conv.conversationId;
           const preview = getPreview(conv.latestMessage);
