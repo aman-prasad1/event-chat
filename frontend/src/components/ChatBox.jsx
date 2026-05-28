@@ -368,7 +368,7 @@ const ChatBox = () => {
                     </div>
                   ) : (
                     <div
-                      className={`max-w-[70%] px-3.5 py-2 text-sm leading-relaxed break-words ${
+                      className={`max-w-[70%] px-3.5 py-2 text-sm leading-relaxed wrap-break-word ${
                         isSelf
                           ? "rounded-2xl rounded-br-md text-white"
                           : "rounded-2xl rounded-bl-md"
@@ -423,7 +423,7 @@ const ChatBox = () => {
             {selectedFiles.map((file, idx) => (
               <div
                 key={`${file.name}-${idx}`}
-                className="flex items-center gap-1.5 pl-2.5 pr-1.5 py-1.5 rounded-lg text-xs max-w-[200px] group transition-all duration-200"
+                className="flex items-center gap-1.5 pl-2.5 pr-1.5 py-1.5 rounded-lg text-xs max-w-50 group transition-all duration-200"
                 style={{
                   backgroundColor: 'var(--color-border)',
                   color: 'var(--color-text-primary)',

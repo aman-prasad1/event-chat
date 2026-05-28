@@ -62,7 +62,7 @@ const Sidebar = () => {
   if (isLoading) {
     return (
       <aside
-        className="w-[340px] min-w-[340px] max-md:w-full max-md:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
+        className="w-85 min-w-85 max-md:w-full max-md:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
         style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-border)' }}
       >
         <div className="px-5 pt-5 pb-3 border-b" style={{ borderColor: 'var(--color-border)' }}>
@@ -96,7 +96,7 @@ const Sidebar = () => {
   if (!conversations || conversations.length === 0) {
     return (
       <aside
-        className="w-[340px] min-w-[340px] max-md:w-full max-md:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
+        className="w-85 min-w-85 max-md:w-full max-md:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
         style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-border)' }}
       >
         <div className="px-5 pt-5 pb-3 border-b" style={{ borderColor: 'var(--color-border)' }}>
@@ -123,7 +123,7 @@ const Sidebar = () => {
 
   return (
     <aside
-      className="w-[340px] min-w-[340px] max-md:w-full max-md:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
+      className="w-85 min-w-85 max-md:w-full max-md:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
       style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-border)' }}
     >
       <div className="px-5 pt-5 pb-3 border-b" style={{ borderColor: 'var(--color-border)' }}>
@@ -141,13 +141,13 @@ const Sidebar = () => {
             <button
               key={conv.conversationId}
               className={`flex items-center gap-3 w-full p-3 border-none rounded-xl text-left cursor-pointer transition-colors duration-150 ${
-                isActive ? 'bg-accent-primary/10' : 'bg-transparent hover:bg-[var(--color-border)]'
+                isActive ? 'bg-accent-primary/10' : 'bg-transparent hover:bg-border'
               }`}
               onClick={() => setSelectedConversation(conv)}
               id={`conv-${conv.conversationId}`}
             >
               {/* Avatar */}
-              <div className="relative w-11 h-11 min-w-[44px] rounded-full overflow-hidden">
+              <div className="relative w-11 h-11 min-w-11 rounded-full overflow-hidden">
                 {avatar ? (
                   <img src={avatar} alt={name} className="w-full h-full object-cover rounded-full" />
                 ) : (
@@ -190,7 +190,7 @@ const Sidebar = () => {
                   </span>
                   {conv.unreadCount > 0 && (
                     <span
-                      className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[11px] font-bold text-white rounded-full shrink-0"
+                      className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 text-[11px] font-bold text-white rounded-full shrink-0"
                       style={{ backgroundColor: 'var(--color-accent-primary)' }}
                     >
                       {conv.unreadCount > 99 ? "99+" : conv.unreadCount}
