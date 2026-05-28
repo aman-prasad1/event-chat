@@ -7,6 +7,7 @@ import { useChat } from "../hooks/useChat";
 import { ToastContainer, toast } from "react-toastify";
 import { socket } from "../socketIo";
 import Message from "./Message";
+import "./ChatBox.css";
 
 const ChatBox = () => {
   const { selectedConversation, messages, messagesLoading, addMessage, markMessageAsRead, markPendingFalse, setLatestMessage } = chatStore();
@@ -305,7 +306,7 @@ const ChatBox = () => {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-1 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-1 chat-scroll">
         {messages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
