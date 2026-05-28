@@ -10,6 +10,7 @@ const chatStore = create((set, get) => ({
   setSelectedConversation: (conversation) => set({ selectedConversation: conversation }),
   setIsLoading: (loading) => set({ isLoading: loading }),
   setMessages: (messages) => set({ messages }),
+  prependMessages: (messages) => set((state) => ({ messages: [...messages, ...state.messages] })),
   setMessagesLoading: (loading) => set({ messagesLoading: loading }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
   markPendingFalse: (tempId) => set((state) => ({

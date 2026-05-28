@@ -18,16 +18,19 @@ const getRecentConversations = async () => {
   }
 };
 
-const getMessages = async (conversationId) => {
-  const { setMessages, setMessagesLoading } = chatStore.getState();
+const getMessages = async (conversationId, cursor = null, limit = 20) => {
+  const { setMessagesLoading } = chatStore.getState();
 
   setMessagesLoading(true);
   try {
-    const response = await axiosInstance.get(`/messages/conversation-messages/${conversationId}`);
-    const messages = response.data.data.messages;
-    // API returns messages in desc order, reverse for chronological display
-    setMessages(messages.reverse());
-    return messages;
+    const response = await axiosInstance.get(`/messages/conversation-messages/${conversationId}`, {
+      params: {
+        limit,
+        ...(cursor ? { cursor } : {}),
+      },
+    });
+
+    return response.data.data;
   } catch (error) {
     console.error('Failed to fetch messages:', error.response?.data || error.message);
     throw error;

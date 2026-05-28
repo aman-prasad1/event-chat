@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { RiSendPlane2Fill, RiAttachment2, RiImageLine, RiVideoLine, RiMusicLine, RiFilePdfLine, RiFileExcel2Line, RiFileWord2Line, RiFileZipLine, RiErrorWarningLine } from "react-icons/ri";
 import { IoClose, IoCloudyNight } from "react-icons/io5";
 import { chatStore } from "../store/chatStore";
@@ -10,36 +10,137 @@ import Message from "./Message";
 import "./ChatBox.css";
 
 const ChatBox = () => {
-  const { selectedConversation, messages, messagesLoading, addMessage, markMessageAsRead, markPendingFalse, setLatestMessage } = chatStore();
+  const { selectedConversation, messages, messagesLoading, setMessages, prependMessages, addMessage, markMessageAsRead, markPendingFalse, setLatestMessage } = chatStore();
   const { user } = userStore();
   const { getMessages, sendMessage, sendFileMessage, getFileUrl } = useChat();
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [fileSizeWarning, setFileSizeWarning] = useState("");
+  const [nextCursor, setNextCursor] = useState(null);
+  const [isLoadingOlder, setIsLoadingOlder] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
+  const pendingScrollAdjustmentRef = useRef(null);
 
 
   const toastRef = useRef(null);
 
+  const scrollMessagesToBottom = (behavior = "auto") => {
+    const container = messagesContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior,
+    });
+  };
+
   // Fetch messages when conversation changes
   useEffect(() => {
-    if (selectedConversation?.conversationId) {
-      getMessages(selectedConversation.conversationId);
+    let isActive = true;
+    pendingScrollAdjustmentRef.current = null;
 
-      // mark all messages as seen
-      for(const msgId of selectedConversation.unreadMessageIds || []) {
-        socket.emit("message_seen", { messageId: msgId });
-      }
-      markMessageAsRead(selectedConversation.conversationId);
+    if (selectedConversation?.conversationId) {
+      setMessages([]);
+      setNextCursor(null);
+      setIsLoadingOlder(false);
+
+      (async () => {
+        try {
+          const data = await getMessages(selectedConversation.conversationId);
+          if (!isActive) {
+            return;
+          }
+
+          // API returns messages in desc order, reverse for chronological display
+          setMessages([...data.messages].reverse());
+          setNextCursor(data.nextCursor);
+
+          // mark all messages as seen
+          for(const msgId of selectedConversation.unreadMessageIds || []) {
+            socket.emit("message_seen", { messageId: msgId });
+          }
+          markMessageAsRead(selectedConversation.conversationId);
+        } catch (error) {
+          if (isActive) {
+            pendingScrollAdjustmentRef.current = null;
+          }
+          console.error("Failed to load messages:", error);
+        }
+      })();
     }
+
+    return () => {
+      isActive = false;
+    };
   }, [selectedConversation]);
 
-  // Auto-scroll to bottom on new messages
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const loadOlderMessages = async () => {
+    if (!selectedConversation?.conversationId || !nextCursor || isLoadingOlder) {
+      return;
+    }
+
+    const container = messagesContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    pendingScrollAdjustmentRef.current = {
+      scrollHeight: container.scrollHeight,
+      scrollTop: container.scrollTop,
+    };
+
+    setIsLoadingOlder(true);
+
+    try {
+      const data = await getMessages(selectedConversation.conversationId, nextCursor);
+      prependMessages([...data.messages].reverse());
+      setNextCursor(data.nextCursor);
+    } catch (error) {
+      pendingScrollAdjustmentRef.current = null;
+      console.error("Failed to load older messages:", error);
+    } finally {
+      setIsLoadingOlder(false);
+    }
+  };
+
+  const handleMessagesScroll = () => {
+    const container = messagesContainerRef.current;
+
+    if (!container || isLoadingOlder || !nextCursor) {
+      return;
+    }
+
+    if (container.scrollTop <= 40) {
+      loadOlderMessages();
+    }
+  };
+
+  // Preserve scroll position when older messages are prepended and keep the chat pinned to the bottom otherwise
+  useLayoutEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const pendingAdjustment = pendingScrollAdjustmentRef.current;
+    if (pendingAdjustment) {
+      const nextScrollTop = container.scrollHeight - pendingAdjustment.scrollHeight + pendingAdjustment.scrollTop;
+      container.scrollTop = nextScrollTop;
+      pendingScrollAdjustmentRef.current = null;
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      scrollMessagesToBottom("auto");
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
   }, [messages]);
 
   // Focus input when conversation opens
@@ -306,7 +407,18 @@ const ChatBox = () => {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-1 chat-scroll">
+      <div
+        ref={messagesContainerRef}
+        onScroll={handleMessagesScroll}
+        className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-1 chat-scroll"
+      >
+        {isLoadingOlder && (
+          <div className="flex justify-center py-2">
+            <span className="text-[11px] px-3 py-1 rounded-full" style={{ color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-border)' }}>
+              Loading earlier messages...
+            </span>
+          </div>
+        )}
         {messages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
