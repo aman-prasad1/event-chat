@@ -63,6 +63,7 @@ const App = () => {
       // add message to store if belongs to the currently selected conversation
       if(selectedConversation && data.message.conversationId === selectedConversation.conversationId) {
         addMessage(data.message);
+        socket.emit('message_seen', { messageId: data.message.id });
       }
       else {
         incrementUnreadCount(data.message.conversationId, data.message.id);
