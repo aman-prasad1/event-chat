@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { RiSendPlane2Fill, RiAttachment2, RiImageLine, RiVideoLine, RiMusicLine, RiFilePdfLine, RiFileExcel2Line, RiFileWord2Line, RiFileZipLine, RiErrorWarningLine } from "react-icons/ri";
 import { IoClose, IoCloudyNight } from "react-icons/io5";
+import InputEmoji from "react-input-emoji";
 import { chatStore } from "../store/chatStore";
 import { userStore } from "../store/userStore";
 import { useChat } from "../hooks/useChat";
@@ -246,8 +247,8 @@ const ChatBox = () => {
   };
 
   // Handle send
-  const handleSend = async () => {
-    const text = input.trim();
+  const handleSend = async (messageText = input) => {
+    const text = messageText.trim();
     const hasFiles = selectedFiles.length > 0;
     if ((!text && !hasFiles) || sending) return;
 
@@ -304,11 +305,18 @@ const ChatBox = () => {
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
+  // Convert sanitized HTML from InputEmoji (which uses <br> for newlines)
+  // into plain text with newline characters before sending.
+  const htmlToPlain = (html) => {
+    if (!html) return "";
+    // replace various br forms with newlines
+    let s = html.replace(/<br\s*\/?>/gi, "\n");
+    s = s.replace(/<\/?div>/gi, "\n");
+    // strip any remaining tags
+    s = s.replace(/<[^>]*>/g, "");
+    // collapse multiple newlines
+    s = s.replace(/\n{3,}/g, "\n\n");
+    return s;
   };
 
   const handleGetFileUrl = async (msg) => {
@@ -545,33 +553,36 @@ const ChatBox = () => {
             <RiAttachment2 size={18} />
           </button>
 
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
-            rows={1}
-            className="flex-1 resize-none bg-transparent border-none outline-none text-sm py-1"
-            style={{
-              color: 'var(--color-text-primary)',
-              maxHeight: '120px',
-              fontFamily: 'var(--font-sans)',
-              lineHeight: '1.5',
-            }}
-            onInput={(e) => {
-              e.target.style.height = 'auto';
-              e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
-            }}
-          />
+          <div className="flex-1 chatbox-emoji-input-shell">
+            <InputEmoji
+              ref={inputRef}
+              value={input}
+              onChange={setInput}
+              onEnter={(html) => handleSend(htmlToPlain(html))}
+              placeholder="Type a message..."
+              cleanOnEnter={true}
+              shouldReturn={true}
+              height={44}
+              borderRadius={12}
+              borderColor="transparent"
+              background="transparent"
+              color="var(--color-text-primary)"
+              placeholderColor="var(--color-text-secondary)"
+              fontSize={14}
+              fontFamily="var(--font-sans)"
+              inputClass="chatbox-emoji-input"
+              theme="auto"
+            />
+          </div>
           <button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={(!input.trim() && selectedFiles.length === 0) || sending}
             className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg border-none cursor-pointer transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
             style={{
               backgroundColor: 'var(--color-accent-primary)',
               color: '#fff',
             }}
+            type="button"
           >
             <RiSendPlane2Fill size={16} />
           </button>

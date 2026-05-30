@@ -30,6 +30,48 @@
   background: transparent;
 }
 
+.chatbox-emoji-input-shell .react-input-emoji--container {
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  border-color: var(--color-border);
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.chatbox-emoji-input-shell .react-input-emoji--wrapper {
+  align-items: center;
+}
+
+.chatbox-emoji-input-shell .react-input-emoji--input {
+  flex: 1;
+  min-height: 44px;
+  padding: 10px 12px;
+  background: transparent;
+  color: var(--color-text-primary);
+}
+
+.chatbox-emoji-input-shell .react-input-emoji--button {
+  order: -1;
+  padding-left: 10px;
+  padding-right: 0;
+  color: var(--color-text-secondary);
+}
+
+.chatbox-emoji-input-shell .react-input-emoji--button:hover {
+  color: var(--color-text-primary);
+}
+
+.chatbox-emoji-input-shell .react-emoji-picker--wrapper {
+  left: 0;
+  right: auto;
+}
+
+.chatbox-emoji-input-shell .react-input-emoji--placeholder {
+  color: var(--color-text-secondary);
+  left: 12px;
+}
+
 /* Optional: make scrollbars a touch bigger on very small screens */
 @media (max-width: 640px) {
   .chat-scroll::-webkit-scrollbar {
