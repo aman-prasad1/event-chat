@@ -3,6 +3,7 @@ import { RiChat3Line } from "react-icons/ri";
 import { userStore } from "../store/userStore";
 import { chatStore } from "../store/chatStore";
 import Sidebar from "../components/Sidebar";
+import RecentChatsSideBar from "../components/RecentChatsSideBar";
 import ChatBox from "../components/ChatBox";
 
 const Home = () => {
@@ -10,14 +11,15 @@ const Home = () => {
   const { selectedConversation } = chatStore();
 
   return (
-    <div className="flex h-[calc(100vh-60px)] overflow-hidden">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
+      <RecentChatsSideBar />
       {selectedConversation ? (
         <ChatBox />
       ) : (
         <main
           className="flex-1 flex items-center justify-center max-md:hidden transition-colors duration-300"
-          style={{ backgroundColor: 'var(--color-primary)' }}
+          style={{ backgroundColor: 'var(--color-chatbox-bg, var(--color-primary))' }}
         >
           <div className="text-center p-8">
             <RiChat3Line size={60} className="block mb-4 mx-auto opacity-40" style={{ color: 'var(--color-text-secondary)' }} />
@@ -38,3 +40,4 @@ const Home = () => {
 };
 
 export default Home;
+

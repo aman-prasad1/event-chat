@@ -351,12 +351,12 @@ const ChatBox = () => {
     return (
       <div
         className="flex-1 flex flex-col transition-colors duration-300"
-        style={{ backgroundColor: 'var(--color-primary)' }}
+        style={{ backgroundColor: 'var(--color-chatbox-bg, var(--color-primary))' }}
       >
         {/* Header */}
         <div
-          className="flex items-center gap-3 px-5 py-3 border-b"
-          style={{ borderColor: 'var(--color-border)' }}
+          className="flex items-center gap-3 px-5 h-[60px] border-b"
+          style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-primary)' }}
         >
           <div className="w-9 h-9 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-border)' }} />
           <div className="h-4 w-28 rounded animate-pulse" style={{ backgroundColor: 'var(--color-border)' }} />
@@ -382,13 +382,13 @@ const ChatBox = () => {
   return (
     <div
       className="flex-1 flex flex-col transition-colors duration-300"
-      style={{ backgroundColor: 'var(--color-primary)' }}
+      style={{ backgroundColor: 'var(--color-chatbox-bg, var(--color-primary))' }}
     >
       <ToastContainer />
       {/* Chat Header */}
       <div
-        className="flex items-center gap-3 px-5 py-3 border-b shrink-0"
-        style={{ borderColor: 'var(--color-border)' }}
+        className="flex items-center gap-3 px-5 h-[60px] border-b shrink-0"
+        style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-primary)' }}
       >
         <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
           {otherUser?.avatar_url ? (
@@ -464,6 +464,7 @@ const ChatBox = () => {
                   isSelf={isSelf}
                   messageTime={messageTime}
                   onGetFileUrl={handleGetFileUrl}
+                  otherUser={otherUser}
                 />
               </div>
             );
@@ -550,7 +551,7 @@ const ChatBox = () => {
             title="Attach files"
             type="button"
           >
-            <RiAttachment2 size={18} />
+            <RiAttachment2 size={22} />
           </button>
 
           <div className="flex-1 chatbox-emoji-input-shell">
@@ -577,10 +578,10 @@ const ChatBox = () => {
           <button
             onClick={() => handleSend()}
             disabled={(!input.trim() && selectedFiles.length === 0) || sending}
-            className="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg border-none cursor-pointer transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full border-none cursor-pointer transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
             style={{
-              backgroundColor: 'var(--color-accent-primary)',
-              color: '#fff',
+              backgroundColor: 'var(--color-send-btn-bg)',
+              color: 'var(--color-send-btn-text)',
             }}
             type="button"
           >

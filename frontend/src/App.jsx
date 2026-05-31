@@ -1,6 +1,6 @@
 import { React, lazy, Suspense, useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import Navbar from './components/Navbar'
+// import Navbar from './components/Navbar'
 import { themeStore } from './store/themeStore'
 import { userStore } from './store/userStore'
 import { useAuth } from './hooks/useAuth'
@@ -80,7 +80,7 @@ const App = () => {
     <BrowserRouter>
       <Suspense fallback={<div>Loading...</div>}>
         <div className="min-h-screen font-sans">
-          <Navbar />
+          {/* <Navbar /> */}
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />

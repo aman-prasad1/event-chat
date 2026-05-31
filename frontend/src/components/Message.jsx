@@ -1,33 +1,44 @@
 import React from "react";
 import { RiDownloadLine, RiFileTextLine } from "react-icons/ri";
 
-const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl }) => {
+const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl, otherUser }) => {
+  const getInitials = (member) => {
+    if (member?.first_name && member?.last_name) {
+      return `${member.first_name[0]}${member.last_name[0]}`.toUpperCase();
+    }
+    if (member?.username) return member.username[0].toUpperCase();
+    return "U";
+  };
+
   return (
     <div className={`flex ${isSelf ? "justify-end" : "justify-start"} mb-2`}>
-      <div className="flex gap-2">
-        {isSelf && messageTime && (
-          <div
-            className="text-[10px] whitespace-nowrap shrink-0 flex items-center"
-            style={{
-              color: "var(--color-text-secondary)",
-              transform: "translateY(0.85rem)",
-              marginRight: "6px",
-            }}
-          >
-            {messageTime}
+      <div className={`flex gap-2 items-end ${isSelf ? "flex-row-reverse" : "flex-row"}`}>
+        {/* Avatar - only for other user */}
+        {!isSelf && (
+          <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 mb-0.5">
+            {otherUser?.avatar_url ? (
+              <img src={otherUser.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
+            ) : (
+              <span
+                className="flex items-center justify-center w-full h-full text-[10px] font-bold text-white rounded-full"
+                style={{ background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))' }}
+              >
+                {getInitials(otherUser)}
+              </span>
+            )}
           </div>
         )}
 
+        <div className={`flex flex-col ${isSelf ? "items-end" : "items-start"}`}>
         {msg.type === "file" ? (
           <div
             className={`rounded-2xl overflow-hidden max-w-xs sm:max-w-sm md:max-w-md ${msg._pending ? "opacity-60" : ""}`}
             style={{
               ...(isSelf
                 ? {
-                    background:
-                      "linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))",
+                    backgroundColor: "var(--color-msg-self-bg)",
                   }
-                : { backgroundColor: "var(--color-border)" }),
+                : { backgroundColor: "var(--color-msg-other-bg)" }),
             }}
           >
             <div
@@ -51,7 +62,7 @@ const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl }) => {
                 <RiFileTextLine
                   size={22}
                   style={{
-                    color: isSelf ? "#fff" : "var(--color-text-secondary)",
+                    color: isSelf ? "var(--color-msg-self-text)" : "var(--color-text-secondary)",
                   }}
                 />
               </div>
@@ -60,7 +71,7 @@ const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl }) => {
                 <p
                   className="text-sm font-medium m-0 truncate"
                   style={{
-                    color: isSelf ? "#fff" : "var(--color-text-primary)",
+                    color: isSelf ? "var(--color-msg-self-text)" : "var(--color-text-primary)",
                   }}
                   title={msg.content?.filename}
                 >
@@ -70,7 +81,7 @@ const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl }) => {
                   className="text-[11px] m-0 mt-0.5"
                   style={{
                     color: isSelf
-                      ? "rgba(255,255,255,0.7)"
+                      ? "rgba(0,0,0,0.5)"
                       : "var(--color-text-secondary)",
                   }}
                 >
@@ -84,7 +95,7 @@ const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl }) => {
                   backgroundColor: isSelf
                     ? "rgba(255,255,255,0.18)"
                     : "rgba(0,0,0,0.08)",
-                  color: isSelf ? "#fff" : "var(--color-text-secondary)",
+                  color: isSelf ? "var(--color-msg-self-text)" : "var(--color-text-secondary)",
                 }}
                 title="Download"
                 type="button"
@@ -95,19 +106,19 @@ const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl }) => {
           </div>
         ) : (
           <div
-            className={`px-3.5 py-2 text-sm leading-relaxed break-all whitespace-pre-wrap max-w-xs sm:max-w-sm md:max-w-md ${
+            className={`px-3.5 py-2 text-[15px] font-medium leading-relaxed break-all whitespace-pre-wrap max-w-xs sm:max-w-sm md:max-w-md ${
               isSelf
-                ? "rounded-2xl rounded-br-md text-white"
+                ? "rounded-2xl rounded-br-md"
                 : "rounded-2xl rounded-bl-md"
             } ${msg._pending ? "opacity-60" : ""}`}
             style={
               isSelf
                 ? {
-                    background:
-                      "linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))",
+                    backgroundColor: "var(--color-msg-self-bg)",
+                    color: "var(--color-msg-self-text)",
                   }
                 : {
-                    backgroundColor: "var(--color-border)",
+                    backgroundColor: "var(--color-msg-other-bg)",
                     color: "var(--color-text-primary)",
                   }
             }
@@ -116,18 +127,15 @@ const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl }) => {
           </div>
         )}
 
-        {!isSelf && messageTime && (
-          <div
-            className="text-[10px] whitespace-nowrap shrink-0 flex items-center"
-            style={{
-              color: "var(--color-text-secondary)",
-              transform: "translateY(0.85rem)",
-              marginLeft: "6px",
-            }}
+        {messageTime && (
+          <span
+            className="text-[10px] mt-1 px-1"
+            style={{ color: "var(--color-text-secondary)" }}
           >
             {messageTime}
-          </div>
+          </span>
         )}
+      </div>
       </div>
     </div>
   );

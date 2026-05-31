@@ -3,6 +3,7 @@
 @theme {
     /* Light Theme */
     --color-primary: #fff;
+    --color-chatbox-bg: #fafafa;
     --color-text-primary: #101828;
     --color-text-secondary: #475467;
     --color-border: #e5e7eb;
@@ -11,6 +12,14 @@
     --color-accent-primary-hover: #4338ca;
     --color-accent-primary-light: #a5b4fc;
     --color-accent-primary-lighter: #818cf8;
+    --color-msg-self-bg: #171717;
+    --color-msg-self-text: #e5e5e5;
+    --color-msg-other-bg: #fff;
+    --color-sidebar-active: rgba(79, 70, 229, 0.1);
+    --color-unread-badge: #171717;
+    --color-unread-badge-text: #fff;
+    --color-send-btn-bg: #171717;
+    --color-send-btn-text: #fff;
 }
 
 /* Font stacks */
@@ -21,7 +30,8 @@
 
 /* ─── Dark Theme Overrides ─── */
 [data-theme="dark"] {
-    --color-primary: #0f1117;
+    --color-primary: #171717;
+    --color-chatbox-bg: #0a0a0a;
     --color-text-primary: #f0f1f3;
     --color-text-secondary: #9ca3af;
     --color-border: #1e2130;
@@ -33,6 +43,14 @@
 
     --color-surface: #161924;
     --color-surface-hover: #1e2130;
+    --color-msg-self-bg: #e5e5e5;
+    --color-msg-self-text: #1a1a1a;
+    --color-msg-other-bg: #171717;
+    --color-sidebar-active: #272727;
+    --color-unread-badge: #e5e5e5;
+    --color-unread-badge-text: #0a0a0a;
+    --color-send-btn-bg: #e5e5e5;
+    --color-send-btn-text: #0a0a0a;
 }
 
 /* Base typography */
