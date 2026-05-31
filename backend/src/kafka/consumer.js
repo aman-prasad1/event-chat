@@ -50,7 +50,7 @@ export const startConsumer = async () => {
                 // invalidate conversation cache for all members
                 await Promise.all(
                     members.map(m =>
-                        redisClient.del(`conversations:${m.userId}`)
+                        redisClient.del(`conversation:${m.userId}`)
                     )
                 );
 
