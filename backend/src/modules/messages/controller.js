@@ -6,6 +6,7 @@ import { uploadToS3, getSignedFileUrl } from '../../utils/s3.js';
 import { io, isUserOnline, publishToRedis } from '../../socketIo.js';
 import { redisClient } from '../../redis/index.js';
 import fs from 'fs';
+import { kafkaProducer } from '../../kafka/index.js';
 
 const createDirectConversation = asyncHandler(async (req, res) => {
     try {
@@ -167,50 +168,32 @@ const createConversationMessage = asyncHandler(async (req, res) => {
             throw new ApiError(400, 'Unsupported message type');
         }
 
-        const message = await prisma.message.create({
-            data: {
-                conversationId,
-                senderId: req.user.id,
-                content: parsedContent,
-                type
-            }
-        });
-
         const members = await prisma.conversationMember.findMany({
             where: { conversationId },
             select: { userId: true }
         });
 
-        await Promise.all(
-            members
-                .filter(m => m.userId !== req.user.id)
-                .map(async (m) => {
-                    await prisma.messageStatus.create({
-                        data: {
-                            messageId: message.id,
-                            userId: m.userId,
-                            status: 'sent'
-                        }
-                    });
 
-                    // clear redis cache for recent conversations of the recipient to ensure they get the updated conversation list with the new message
-                    await redisClient.del(`conversation:${m.userId}`);
-
-                    const online = await isUserOnline(m.userId);
-                    if (online) {
-                        await publishToRedis("message_received", {
-                            recipientId: m.userId,
-                            message
-                        });
-                    }
-                })
-        );
-        // clear redis cache for recent conversations for the sender
-        await redisClient.del(`conversation:${req.user?.id}`);
+        // produce message to Kafka topic for asynchronous processing
+        await kafkaProducer.send({
+            topic: 'messages',
+            messages: [
+                {
+                    key: conversationId,
+                    value: JSON.stringify({
+                        conversationId,
+                        senderId: req.user.id,
+                        content: parsedContent,
+                        type,
+                        members
+                    })
+                }
+            ]
+        })
 
         res
-            .status(201)
-            .json(new ApiResponse(201, 'Message sent successfully', { "messageId": message.id }));
+            .status(202)
+            .json(new ApiResponse(202, 'Message queued successfully'));
     } catch (error) {
 
         if (error.code === "P2003") {
