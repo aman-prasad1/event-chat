@@ -1,15 +1,138 @@
-import React, { useEffect, useState } from "react";
-import { RiChat3Line, RiAttachment2 } from "react-icons/ri";
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { RiChat3Line, RiAttachment2, RiMenuLine, RiCloseLine, RiSettings4Line, RiLogoutBoxRLine, RiSunLine, RiMoonLine } from "react-icons/ri";
 import { chatStore } from "../store/chatStore";
 import { userStore } from "../store/userStore";
+import { themeStore } from "../store/themeStore";
 import { useChat } from "../hooks/useChat";
+import { useAuth } from "../hooks/useAuth";
 import SearchBar from "./SearchBar";
 
 const RecentChatsSideBar = () => {
   const { conversations, selectedConversation, isLoading, setSelectedConversation } = chatStore();
   const { user } = userStore();
+  const { theme, toggleTheme } = themeStore();
   const { getRecentConversations } = useChat();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout.mutateAsync();
+    } catch (error) {}
+    finally {
+      setMenuOpen(false);
+      navigate("/login");
+    }
+  };
+
+  const getUserInitials = () => {
+    if (!user) return "";
+    if (user.first_name && user.last_name) return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
+    if (user.username) return user.username[0].toUpperCase();
+    return "U";
+  };
+
+  // Mobile menu dropdown
+  const MobileMenu = () => (
+    <div className="relative lg:hidden" ref={menuRef}>
+      <button
+        onClick={() => setMenuOpen((prev) => !prev)}
+        className="flex items-center justify-center w-9 h-9 rounded-xl border-none cursor-pointer transition-all duration-200"
+        style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)' }}
+        type="button"
+      >
+        {menuOpen ? <RiCloseLine size={22} /> : <RiMenuLine size={22} />}
+      </button>
+
+      {menuOpen && (
+        <div
+          className="absolute right-0 top-[calc(100%+8px)] min-w-[220px] rounded-xl overflow-hidden z-50"
+          style={{
+            backgroundColor: 'var(--color-primary)',
+            border: '1px solid var(--color-border)',
+            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 10px 15px -3px rgba(0,0,0,0.08)',
+          }}
+        >
+          {/* User info */}
+          <div className="px-4 py-3 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
+              {user?.profilePic ? (
+                <img src={user.profilePic} alt="" className="w-full h-full object-cover rounded-full" />
+              ) : (
+                <span
+                  className="flex items-center justify-center w-full h-full text-[11px] font-bold text-white rounded-full"
+                  style={{ background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))' }}
+                >
+                  {getUserInitials()}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold m-0 truncate" style={{ color: 'var(--color-text-primary)' }}>
+                {user?.first_name ? `${user.first_name} ${user.last_name || ""}` : user?.username}
+              </p>
+              <p className="text-xs mt-0.5 m-0" style={{ color: 'var(--color-text-secondary)' }}>
+                @{user?.username}
+              </p>
+            </div>
+          </div>
+          <div className="h-px" style={{ backgroundColor: 'var(--color-border)' }} />
+
+          {/* Theme toggle */}
+          <button
+            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm bg-transparent border-none cursor-pointer transition-all duration-150"
+            style={{ color: 'var(--color-text-secondary)' }}
+            onClick={() => { toggleTheme(); setMenuOpen(false); }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-text-primary)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
+          >
+            {theme === "light" ? <RiMoonLine size={16} /> : <RiSunLine size={16} />}
+            <span>{theme === "light" ? "Dark mode" : "Light mode"}</span>
+          </button>
+
+          {/* Settings */}
+          <button
+            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm bg-transparent border-none cursor-pointer transition-all duration-150"
+            style={{ color: 'var(--color-text-secondary)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-text-primary)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
+          >
+            <RiSettings4Line size={16} />
+            <span>Settings</span>
+          </button>
+
+          <div className="h-px" style={{ backgroundColor: 'var(--color-border)' }} />
+
+          {/* Logout */}
+          <button
+            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm bg-transparent border-none cursor-pointer transition-all duration-150"
+            style={{ color: 'var(--color-text-secondary)' }}
+            onClick={handleLogout}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.08)'; e.currentTarget.style.color = '#ef4444'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
+          >
+            <RiLogoutBoxRLine size={16} />
+            <span>Log out</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
 
   useEffect(() => {
     getRecentConversations();
@@ -64,11 +187,12 @@ const RecentChatsSideBar = () => {
   if (isLoading) {
     return (
       <aside
-        className="w-[476px] min-w-[476px] max-md:w-full max-md:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
+        className="w-[476px] min-w-[476px] max-lg:w-full max-lg:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
         style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-border)' }}
       >
-        <div className="px-5 flex items-center h-[72px]">
+        <div className="px-5 flex items-center justify-between h-[72px]">
           <h2 className="text-[22px] font-bold m-0 tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Chats</h2>
+          <MobileMenu />
         </div>
         <SearchBar onSearch={setSearchQuery} />
         <div className="flex-1 overflow-y-auto p-2">
@@ -99,11 +223,12 @@ const RecentChatsSideBar = () => {
   if (!conversations || conversations.length === 0) {
     return (
       <aside
-        className="w-[476px] min-w-[476px] max-md:w-full max-md:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
+        className="w-[476px] min-w-[476px] max-lg:w-full max-lg:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
         style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-border)' }}
       >
-        <div className="px-5 flex items-center h-[72px]">
+        <div className="px-5 flex items-center justify-between h-[72px]">
           <h2 className="text-[22px] font-bold m-0 tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Chats</h2>
+          <MobileMenu />
         </div>
         <SearchBar onSearch={setSearchQuery} />
         <div className="flex-1 flex flex-col items-center justify-center px-5 py-8 text-center">
@@ -134,11 +259,12 @@ const RecentChatsSideBar = () => {
 
   return (
     <aside
-      className="w-[476px] min-w-[476px] max-md:w-full max-md:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
+      className="w-[476px] min-w-[476px] max-lg:w-full max-lg:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
       style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-border)' }}
     >
-      <div className="px-5 flex items-center h-[72px]">
+      <div className="px-5 flex items-center justify-between h-[72px]">
         <h2 className="text-[22px] font-bold m-0 tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Chats</h2>
+        <MobileMenu />
       </div>
       <SearchBar onSearch={setSearchQuery} />
       <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">

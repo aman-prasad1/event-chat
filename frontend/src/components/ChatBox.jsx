@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { RiSendPlane2Fill, RiAttachment2, RiImageLine, RiVideoLine, RiMusicLine, RiFilePdfLine, RiFileExcel2Line, RiFileWord2Line, RiFileZipLine, RiErrorWarningLine } from "react-icons/ri";
+import { RiSendPlane2Fill, RiAttachment2, RiImageLine, RiVideoLine, RiMusicLine, RiFilePdfLine, RiFileExcel2Line, RiFileWord2Line, RiFileZipLine, RiErrorWarningLine, RiArrowLeftLine } from "react-icons/ri";
 import { IoClose, IoCloudyNight } from "react-icons/io5";
 import InputEmoji from "react-input-emoji";
 import { chatStore } from "../store/chatStore";
@@ -11,7 +11,7 @@ import Message from "./Message";
 import "./ChatBox.css";
 
 const ChatBox = () => {
-  const { selectedConversation, messages, messagesLoading, setMessages, prependMessages, addMessage, markMessageAsRead, markPendingFalse, setLatestMessage } = chatStore();
+  const { selectedConversation, messages, messagesLoading, setMessages, prependMessages, addMessage, markMessageAsRead, markPendingFalse, setLatestMessage, setSelectedConversation } = chatStore();
   const { user } = userStore();
   const { getMessages, sendMessage, sendFileMessage, getFileUrl } = useChat();
   const [input, setInput] = useState("");
@@ -390,6 +390,15 @@ const ChatBox = () => {
         className="flex items-center gap-3 px-5 h-[72px] border-b shrink-0"
         style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-primary)' }}
       >
+        {/* Back button - mobile only */}
+        <button
+          onClick={() => setSelectedConversation(null)}
+          className="lg:hidden shrink-0 flex items-center justify-center w-8 h-8 rounded-full border-none cursor-pointer transition-all duration-200 hover:scale-105"
+          style={{ backgroundColor: 'transparent', color: 'var(--color-text-primary)' }}
+          type="button"
+        >
+          <RiArrowLeftLine size={22} />
+        </button>
         <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
           {otherUser?.avatar_url ? (
             <img src={otherUser.avatar_url} alt={otherName} className="w-full h-full object-cover rounded-full" />

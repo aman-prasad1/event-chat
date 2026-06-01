@@ -46,7 +46,7 @@ const Sidebar = () => {
 
   return (
     <div
-      className="flex flex-col items-center justify-between py-4 w-[60px] min-w-[60px] border-r transition-colors duration-300"
+      className="flex flex-col items-center justify-between py-4 w-[60px] min-w-[60px] h-screen border-r transition-colors duration-300"
       style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-border)' }}
     >
       {/* Top icons */}
@@ -128,7 +128,7 @@ const Sidebar = () => {
       {/* Bottom - Account */}
       <div className="relative" ref={accountRef}>
         <button
-          className="relative flex items-center justify-center w-10 h-10 rounded-full border-2 bg-transparent cursor-pointer overflow-hidden transition-all duration-200 hover:scale-105"
+          className="relative flex items-center justify-center w-10 h-10 rounded-full border-2 bg-transparent cursor-pointer transition-all duration-200 hover:scale-105"
           style={{ borderColor: 'var(--color-border)' }}
           onClick={() => setAccountOpen((prev) => !prev)}
           title="Account"

@@ -12,13 +12,22 @@ const Home = () => {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar />
-      <RecentChatsSideBar />
+      {/* Icon sidebar - hidden on mobile/tablet */}
+      <div className="max-lg:hidden h-full">
+        <Sidebar />
+      </div>
+
+      {/* Recent chats - hidden on mobile/tablet when a conversation is selected */}
+      <div className={`max-lg:flex-1 ${selectedConversation ? "max-lg:hidden" : ""}`}>
+        <RecentChatsSideBar />
+      </div>
+
+      {/* Chat area - on mobile/tablet, takes full width when conversation selected */}
       {selectedConversation ? (
         <ChatBox />
       ) : (
         <main
-          className="flex-1 flex items-center justify-center max-md:hidden transition-colors duration-300"
+          className="flex-1 flex items-center justify-center max-lg:hidden transition-colors duration-300"
           style={{ backgroundColor: 'var(--color-chatbox-bg, var(--color-primary))' }}
         >
           <div className="text-center p-8">
@@ -40,4 +49,3 @@ const Home = () => {
 };
 
 export default Home;
-
