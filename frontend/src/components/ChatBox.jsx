@@ -355,7 +355,7 @@ const ChatBox = () => {
       >
         {/* Header */}
         <div
-          className="flex items-center gap-3 px-5 h-[60px] border-b"
+          className="flex items-center gap-3 px-5 h-[72px] border-b"
           style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-primary)' }}
         >
           <div className="w-9 h-9 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-border)' }} />
@@ -387,7 +387,7 @@ const ChatBox = () => {
       <ToastContainer />
       {/* Chat Header */}
       <div
-        className="flex items-center gap-3 px-5 h-[60px] border-b shrink-0"
+        className="flex items-center gap-3 px-5 h-[72px] border-b shrink-0"
         style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-primary)' }}
       >
         <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">

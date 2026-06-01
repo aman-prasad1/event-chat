@@ -20,6 +20,7 @@
     --color-unread-badge-text: #fff;
     --color-send-btn-bg: #171717;
     --color-send-btn-text: #fff;
+    --color-search-bg: #e5e7eb;
 }
 
 /* Font stacks */
@@ -51,6 +52,7 @@
     --color-unread-badge-text: #0a0a0a;
     --color-send-btn-bg: #e5e5e5;
     --color-send-btn-text: #0a0a0a;
+    --color-search-bg: #272727;
 }
 
 /* Base typography */
