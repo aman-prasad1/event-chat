@@ -1,25 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import { RiChat3Line } from "react-icons/ri";
 import { userStore } from "../store/userStore";
 import { chatStore } from "../store/chatStore";
 import Sidebar from "../components/Sidebar";
 import RecentChatsSideBar from "../components/RecentChatsSideBar";
+import UserSearchPanel from "../components/UserSearchPanel";
 import ChatBox from "../components/ChatBox";
 
 const Home = () => {
   const { user } = userStore();
   const { selectedConversation } = chatStore();
+  const [showUserSearch, setShowUserSearch] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Icon sidebar - hidden on mobile/tablet */}
       <div className="max-lg:hidden h-full">
-        <Sidebar />
+        <Sidebar
+          showUserSearch={showUserSearch}
+          onToggleUserSearch={() => setShowUserSearch((prev) => !prev)}
+        />
       </div>
 
-      {/* Recent chats - hidden on mobile/tablet when a conversation is selected */}
+      {/* Recent chats or User search panel */}
       <div className={`max-lg:flex-1 ${selectedConversation ? "max-lg:hidden" : ""}`}>
-        <RecentChatsSideBar />
+        {showUserSearch ? (
+          <UserSearchPanel onClose={() => setShowUserSearch(false)} />
+        ) : (
+          <RecentChatsSideBar onNewChat={() => setShowUserSearch(true)} />
+        )}
       </div>
 
       {/* Chat area - on mobile/tablet, takes full width when conversation selected */}

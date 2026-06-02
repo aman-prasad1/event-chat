@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { RiChat3Line, RiAttachment2, RiMenuLine, RiCloseLine, RiSettings4Line, RiLogoutBoxRLine, RiSunLine, RiMoonLine } from "react-icons/ri";
+import { RiChat3Line, RiAttachment2, RiMenuLine, RiCloseLine, RiSettings4Line, RiLogoutBoxRLine, RiSunLine, RiMoonLine, RiUserAddLine } from "react-icons/ri";
 import { chatStore } from "../store/chatStore";
 import { userStore } from "../store/userStore";
 import { themeStore } from "../store/themeStore";
@@ -8,7 +8,7 @@ import { useChat } from "../hooks/useChat";
 import { useAuth } from "../hooks/useAuth";
 import SearchBar from "./SearchBar";
 
-const RecentChatsSideBar = () => {
+const RecentChatsSideBar = ({ onNewChat }) => {
   const { conversations, selectedConversation, isLoading, setSelectedConversation } = chatStore();
   const { user } = userStore();
   const { theme, toggleTheme } = themeStore();
@@ -192,7 +192,27 @@ const RecentChatsSideBar = () => {
       >
         <div className="px-5 flex items-center justify-between h-[72px]">
           <h2 className="text-[22px] font-bold m-0 tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Chats</h2>
-          <MobileMenu />
+          <div className="flex items-center gap-1">
+            {/* New chat button - mobile only */}
+            <button
+              onClick={onNewChat}
+              className="flex items-center justify-center w-9 h-9 rounded-xl border-none cursor-pointer transition-all duration-200 lg:hidden"
+              style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-border)';
+                e.currentTarget.style.color = 'var(--color-text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = 'var(--color-text-secondary)';
+              }}
+              title="New Chat"
+              type="button"
+            >
+              <RiUserAddLine size={20} />
+            </button>
+            <MobileMenu />
+          </div>
         </div>
         <SearchBar onSearch={setSearchQuery} />
         <div className="flex-1 overflow-y-auto p-2">
@@ -228,7 +248,26 @@ const RecentChatsSideBar = () => {
       >
         <div className="px-5 flex items-center justify-between h-[72px]">
           <h2 className="text-[22px] font-bold m-0 tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Chats</h2>
-          <MobileMenu />
+          <div className="flex items-center gap-1">
+            <button
+              onClick={onNewChat}
+              className="flex items-center justify-center w-9 h-9 rounded-xl border-none cursor-pointer transition-all duration-200 lg:hidden"
+              style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-border)';
+                e.currentTarget.style.color = 'var(--color-text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = 'var(--color-text-secondary)';
+              }}
+              title="New Chat"
+              type="button"
+            >
+              <RiUserAddLine size={20} />
+            </button>
+            <MobileMenu />
+          </div>
         </div>
         <SearchBar onSearch={setSearchQuery} />
         <div className="flex-1 flex flex-col items-center justify-center px-5 py-8 text-center">
@@ -262,9 +301,28 @@ const RecentChatsSideBar = () => {
       className="w-[476px] min-w-[476px] max-lg:w-full max-lg:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300"
       style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-border)' }}
     >
-      <div className="px-5 flex items-center justify-between h-[72px]">
-        <h2 className="text-[22px] font-bold m-0 tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Chats</h2>
-        <MobileMenu />
+        <div className="px-5 flex items-center justify-between h-[72px]">
+          <h2 className="text-[22px] font-bold m-0 tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Chats</h2>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={onNewChat}
+              className="flex items-center justify-center w-9 h-9 rounded-xl border-none cursor-pointer transition-all duration-200 lg:hidden"
+              style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-border)';
+                e.currentTarget.style.color = 'var(--color-text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = 'var(--color-text-secondary)';
+              }}
+              title="New Chat"
+              type="button"
+            >
+              <RiUserAddLine size={20} />
+            </button>
+            <MobileMenu />
+          </div>
       </div>
       <SearchBar onSearch={setSearchQuery} />
       <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">

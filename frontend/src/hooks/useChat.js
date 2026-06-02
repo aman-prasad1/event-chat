@@ -77,7 +77,7 @@ const sendFileMessage = async (conversationId, file) => {
 
 const getFileUrl = async (conversationId, messageId) => {
   try {
-    const response = await axiosInstance.get(`/messages/file-url`, 
+    const response = await axiosInstance.get(`/messages/file-url`,
       {
         params: { conversationId, messageId }
       }
@@ -89,6 +89,30 @@ const getFileUrl = async (conversationId, messageId) => {
   }
 };
 
+const searchUsers = async (query) => {
+  try {
+    const response = await axiosInstance.get('/users/search', {
+      params: { query },
+    });
+    return response.data.data.users;
+  } catch (error) {
+    console.error('Failed to search users:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+const createDirectConversation = async (userId) => {
+  try {
+    const response = await axiosInstance.post('/messages/conversations/direct', {
+      userId,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error('Failed to create conversation:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export const useChat = () => {
   return {
     getRecentConversations,
@@ -96,5 +120,7 @@ export const useChat = () => {
     sendMessage,
     sendFileMessage,
     getFileUrl,
+    searchUsers,
+    createDirectConversation,
   };
 };

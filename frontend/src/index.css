@@ -101,6 +101,17 @@ code, pre {
     animation: dropdown-slide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* ─── Scrollbar utility ─── */
 .scrollbar-thin::-webkit-scrollbar {
     width: 4px;

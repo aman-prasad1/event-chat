@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { RiChat3Fill, RiSettings4Line, RiLogoutBoxRLine, RiSunLine, RiMoonLine } from "react-icons/ri";
+import { RiChat3Fill, RiUserAddLine, RiSettings4Line, RiLogoutBoxRLine, RiSunLine, RiMoonLine } from "react-icons/ri";
 import { userStore } from "../store/userStore";
 import { themeStore } from "../store/themeStore";
 import { useAuth } from "../hooks/useAuth";
 
-const Sidebar = () => {
+const Sidebar = ({ showUserSearch, onToggleUserSearch }) => {
   const { user, clearUser } = userStore();
   const { theme, toggleTheme } = themeStore();
   const { logout } = useAuth();
@@ -51,17 +51,56 @@ const Sidebar = () => {
     >
       {/* Top icons */}
       <div className="flex flex-col items-center gap-2">
-        {/* Chat button (active) */}
+        {/* Chat button */}
         <button
           className="flex items-center justify-center w-10 h-10 rounded-xl border-none cursor-pointer transition-all duration-200 hover:scale-105"
           style={{
-            backgroundColor: 'var(--color-sidebar-active)',
-            color: 'var(--color-text-primary)',
+            backgroundColor: !showUserSearch ? 'var(--color-sidebar-active)' : 'transparent',
+            color: !showUserSearch ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+          }}
+          onClick={() => { if (showUserSearch) onToggleUserSearch(); }}
+          onMouseEnter={(e) => {
+            if (showUserSearch) {
+              e.currentTarget.style.backgroundColor = 'var(--color-border)';
+              e.currentTarget.style.color = 'var(--color-text-primary)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (showUserSearch) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--color-text-secondary)';
+            }
           }}
           title="Chats"
           type="button"
         >
           <RiChat3Fill size={22} />
+        </button>
+
+        {/* New chat / Search users button */}
+        <button
+          className="flex items-center justify-center w-10 h-10 rounded-xl border-none cursor-pointer transition-all duration-200 hover:scale-105"
+          style={{
+            backgroundColor: showUserSearch ? 'var(--color-sidebar-active)' : 'transparent',
+            color: showUserSearch ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+          }}
+          onClick={onToggleUserSearch}
+          onMouseEnter={(e) => {
+            if (!showUserSearch) {
+              e.currentTarget.style.backgroundColor = 'var(--color-border)';
+              e.currentTarget.style.color = 'var(--color-text-primary)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!showUserSearch) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--color-text-secondary)';
+            }
+          }}
+          title="New Chat"
+          type="button"
+        >
+          <RiUserAddLine size={22} />
         </button>
 
         {/* Settings button */}
