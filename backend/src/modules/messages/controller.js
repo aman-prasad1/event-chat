@@ -1,12 +1,11 @@
+import { MESSAGES_TOPIC } from '../../constants.js';
 import { prisma } from '../../db/index.js';
-import { ApiError } from '../../utils/ApiError.js';
-import { asyncHandler } from '../../utils/asyncHandler.js';
-import { ApiResponse } from '../../utils/ApiResponse.js';
-import { uploadToS3, getSignedFileUrl } from '../../utils/s3.js';
-import { io, isUserOnline, publishToRedis } from '../../socketIo.js';
-import { redisClient } from '../../redis/index.js';
-import fs from 'fs';
 import { kafkaProducer } from '../../kafka/index.js';
+import { redisClient } from '../../redis/index.js';
+import { ApiError } from '../../utils/ApiError.js';
+import { ApiResponse } from '../../utils/ApiResponse.js';
+import { asyncHandler } from '../../utils/asyncHandler.js';
+import { getSignedFileUrl, uploadToS3 } from '../../utils/s3.js';
 
 const createDirectConversation = asyncHandler(async (req, res) => {
     try {
@@ -176,7 +175,7 @@ const createConversationMessage = asyncHandler(async (req, res) => {
 
         // produce message to Kafka topic for asynchronous processing
         await kafkaProducer.send({
-            topic: 'messages',
+            topic: MESSAGES_TOPIC,
             messages: [
                 {
                     key: conversationId,
@@ -380,9 +379,9 @@ const getFileUrl = asyncHandler(async (req, res) => {
 });
 
 export {
+    createConversationMessage,
     createDirectConversation,
     getConverstionMessages,
-    createConversationMessage,
-    getRecentConversations,
-    getFileUrl
-}
+    getFileUrl,
+    getRecentConversations
+};

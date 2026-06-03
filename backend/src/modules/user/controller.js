@@ -1,9 +1,11 @@
+import fs from 'fs';
+import { AVATAR_CLEANUP_TOPIC } from '../../constants.js';
 import { prisma } from '../../db/index.js';
+import { kafkaProducer } from '../../kafka/index.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
-import { uploadOnCloudinary, deleteFromCloudinary } from '../../utils/cloudinary.js';
-import fs from 'fs';
+import { uploadOnCloudinary } from '../../utils/cloudinary.js';
 
 
 const getUserProfile = asyncHandler(async (req, res) => {
@@ -64,7 +66,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         const updateData = {};
 
         if(req.body?.username && req.body?.username.trim() !== '') {
-            console.log(req.body.username);
             const existingUser = await prisma.user.findUnique({
                 where: { username: req.body.username.trim() }
             });
@@ -101,9 +102,14 @@ const updateUserProfile = asyncHandler(async (req, res) => {
             }
 
             // delete old avatar from cloudinary if it exists
-            if(old_avatar_key) {
-                await deleteFromCloudinary(old_avatar_key);
-            }
+            await kafkaProducer.send({
+                topic: AVATAR_CLEANUP_TOPIC,
+                messages: [
+                    {
+                        value: JSON.stringify({ avatar_key: old_avatar_key })
+                    }
+                ]
+            });
         }
 
         const updatedUser = await prisma.user.update({
@@ -129,7 +135,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     } finally {
         // delete local file after processing
         if(req.file) {
-            console.log("file deleting");
             fs.unlink(req.file.path, (err) => {
                 if (err) {
                     console.log("Error while deleting local file!!!", err);
