@@ -87,12 +87,12 @@ const updateUserProfile = asyncHandler(async (req, res) => {
             updateData.last_name = req.body.last_name.trim();
         }
 
-        const user = await prisma.user.findUnique({
-            where: { id: req.user.id }
-        });
-
 
         if(req.file) {
+            const user = await prisma.user.findUnique({
+                where: { id: req.user.id }
+            });
+
             const old_avatar_key = user.avatar_key;
 
             const cloudinaryResponse = await uploadOnCloudinary(req.file.path, "avatars/");
