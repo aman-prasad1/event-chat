@@ -1,8 +1,9 @@
 import { prisma } from '../../db/index.js';
 import { ApiError } from '../../utils/ApiError.js';
-import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
-import { redisClient } from '../../redis/index.js';
+import { asyncHandler } from '../../utils/asyncHandler.js';
+import { uploadOnCloudinary, deleteFromCloudinary } from '../../utils/cloudinary.js';
+import fs from 'fs';
 
 
 const getUserProfile = asyncHandler(async (req, res) => {
@@ -15,7 +16,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
         createdAt: req.user.createdAt,
         updatedAt: req.user.updatedAt
     }
-    
+
     res
         .status(200)
         .json(new ApiResponse(200, 'User profile retrieved successfully', { user }));
@@ -23,7 +24,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 
 const searchUsers = asyncHandler(async (req, res) => {
     try {
-        
+
         const { query } = req.query;
 
         if (!query || query.trim() === '') {
@@ -58,7 +59,88 @@ const searchUsers = asyncHandler(async (req, res) => {
     }
 });
 
-export { 
+const updateUserProfile = asyncHandler(async (req, res) => {
+    try {
+        const updateData = {};
+
+        if(req.body?.username && req.body?.username.trim() !== '') {
+            console.log(req.body.username);
+            const existingUser = await prisma.user.findUnique({
+                where: { username: req.body.username.trim() }
+            });
+
+            // if new username is taken by another user, throw error
+            if (existingUser && existingUser.id !== req.user.id) {
+                throw new ApiError(400, 'Username is already taken');
+            }
+
+            // if username is valid and not taken, add it to update data
+            updateData.username = req.body.username.trim();
+        }
+
+        if(req.body?.first_name && req.body?.first_name.trim() !== '') {
+            updateData.first_name = req.body.first_name.trim();
+        }
+
+        if(req.body?.last_name && req.body?.last_name.trim() !== '') {
+            updateData.last_name = req.body.last_name.trim();
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id }
+        });
+
+
+        if(req.file) {
+            const old_avatar_key = user.avatar_key;
+
+            const cloudinaryResponse = await uploadOnCloudinary(req.file.path, "avatars/");
+            if(cloudinaryResponse) {
+                updateData.avatar_url = cloudinaryResponse.url;
+                updateData.avatar_key = cloudinaryResponse.public_id;
+            }
+
+            // delete old avatar from cloudinary if it exists
+            if(old_avatar_key) {
+                await deleteFromCloudinary(old_avatar_key);
+            }
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: req.user.id },
+            data: updateData,
+            select: {
+                id: true,
+                first_name: true,
+                last_name: true,
+                username: true,
+                avatar_url: true,
+                createdAt: true,
+                updatedAt: true
+            }
+        });
+
+        res
+            .status(200)
+            .json(new ApiResponse(200, 'User profile updated successfully', { user: updatedUser }));
+
+    } catch (error) {
+        throw new ApiError(error.statusCode || 500, error.message || 'Failed to update user profile');
+    } finally {
+        // delete local file after processing
+        if(req.file) {
+            console.log("file deleting");
+            fs.unlink(req.file.path, (err) => {
+                if (err) {
+                    console.log("Error while deleting local file!!!", err);
+                }
+            });
+        }
+    }
+})
+
+export {
     getUserProfile,
-    searchUsers
+    searchUsers,
+    updateUserProfile
 };
