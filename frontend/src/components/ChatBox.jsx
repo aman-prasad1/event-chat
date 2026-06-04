@@ -9,6 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { socket } from "../socketIo";
 import { getInitials } from "../utils/getInitials";
 import { formatMessageTime, formatDateSeparator, formatFileSize } from "../utils/formatters";
+import Avatar from "./common/Avatar";
 import Message from "./Message";
 import "./ChatBox.css";
 
@@ -360,18 +361,7 @@ const ChatBox = () => {
         >
           <RiArrowLeftLine size={22} />
         </button>
-        <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
-          {otherUser?.avatar_url ? (
-            <img src={otherUser.avatar_url} alt={otherName} className="w-full h-full object-cover rounded-full" />
-          ) : (
-            <span
-              className="flex items-center justify-center w-full h-full text-xs font-bold text-white rounded-full"
-              style={{ background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))' }}
-            >
-              {getInitials(otherUser)}
-            </span>
-          )}
-        </div>
+        <Avatar user={otherUser} size={36} />
         <div className="min-w-0">
           <p className="text-sm font-semibold m-0 truncate" style={{ color: 'var(--color-text-primary)' }}>
             {otherName}

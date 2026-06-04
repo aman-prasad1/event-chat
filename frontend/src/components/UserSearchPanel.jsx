@@ -3,6 +3,7 @@ import { RiSearchLine, RiCloseLine, RiArrowLeftLine, RiUserAddLine, RiLoader4Lin
 import { useChat } from "../hooks/useChat";
 import { userStore } from "../store/userStore";
 import { getInitials } from "../utils/getInitials";
+import Avatar from "./common/Avatar";
 
 const UserSearchPanel = ({ onClose }) => {
   const [query, setQuery] = useState("");
@@ -187,24 +188,7 @@ const UserSearchPanel = ({ onClose }) => {
                 }}
               >
                 {/* Avatar */}
-                <div className="relative w-11 h-11 min-w-11 rounded-full overflow-hidden">
-                  {u.avatar_url ? (
-                    <img
-                      src={u.avatar_url}
-                      alt={u.username}
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  ) : (
-                    <span
-                      className="flex items-center justify-center w-full h-full text-[15px] font-bold text-white rounded-full"
-                      style={{
-                        background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))',
-                      }}
-                    >
-                      {getInitials(u)}
-                    </span>
-                  )}
-                </div>
+                <Avatar user={u} size={44} />
 
                 {/* User info */}
                 <div className="flex-1 min-w-0 flex flex-col gap-0.5">

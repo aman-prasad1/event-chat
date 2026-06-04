@@ -9,6 +9,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useClickOutside } from "../hooks/useClickOutside";
 import { getInitials } from "../utils/getInitials";
 import { formatRelativeTime } from "../utils/formatters";
+import Avatar from "./common/Avatar";
 import SearchBar from "./SearchBar";
 
 const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
@@ -61,18 +62,7 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
         >
           {/* User info */}
           <div className="px-4 py-3 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
-              {user?.profilePic ? (
-                <img src={user.profilePic} alt="" className="w-full h-full object-cover rounded-full" />
-              ) : (
-                <span
-                  className="flex items-center justify-center w-full h-full text-[11px] font-bold text-white rounded-full"
-                  style={{ background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))' }}
-                >
-                  {getUserInitials()}
-                </span>
-              )}
-            </div>
+            <Avatar user={user} size={36} />
             <div className="min-w-0">
               <p className="text-sm font-semibold m-0 truncate" style={{ color: 'var(--color-text-primary)' }}>
                 {user?.first_name ? `${user.first_name} ${user.last_name || ""}` : user?.username}
@@ -318,18 +308,7 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
               id={`conv-${conv.conversationId}`}
             >
               {/* Avatar */}
-              <div className="relative w-11 h-11 min-w-11 rounded-full overflow-hidden">
-                {avatar ? (
-                  <img src={avatar} alt={name} className="w-full h-full object-cover rounded-full" />
-                ) : (
-                  <span
-                    className="flex items-center justify-center w-full h-full text-[15px] font-bold text-white rounded-full"
-                    style={{ background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))' }}
-                  >
-                    {initials}
-                  </span>
-                )}
-              </div>
+              <Avatar user={conv.members?.[0]} size={44} />
 
               {/* Info */}
               <div className="flex-1 min-w-0 flex flex-col gap-0.5">

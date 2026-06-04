@@ -1,6 +1,6 @@
 import React from "react";
 import { RiDownloadLine, RiFileTextLine } from "react-icons/ri";
-import { getInitials } from "../utils/getInitials";
+import Avatar from "./common/Avatar";
 
 const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl, otherUser }) => {
 
@@ -10,18 +10,7 @@ const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl, otherUser }) =>
       <div className={`flex gap-2 items-end ${isSelf ? "flex-row-reverse" : "flex-row"}`}>
         {/* Avatar - only for other user */}
         {!isSelf && (
-          <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 mb-0.5">
-            {otherUser?.avatar_url ? (
-              <img src={otherUser.avatar_url} alt="" className="w-full h-full object-cover rounded-full" />
-            ) : (
-              <span
-                className="flex items-center justify-center w-full h-full text-[10px] font-bold text-white rounded-full"
-                style={{ background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))' }}
-              >
-                {getInitials(otherUser)}
-              </span>
-            )}
-          </div>
+          <Avatar user={otherUser} size={28} className="mb-0.5" />
         )}
 
         <div className={`flex flex-col ${isSelf ? "items-end" : "items-start"}`}>

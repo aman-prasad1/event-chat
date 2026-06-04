@@ -6,6 +6,7 @@ import { themeStore } from "../store/themeStore";
 import { useAuth } from "../hooks/useAuth";
 import { useClickOutside } from "../hooks/useClickOutside";
 import { getInitials } from "../utils/getInitials";
+import Avatar from "./common/Avatar";
 
 const Sidebar = ({ showUserSearch, showSettings, onToggleUserSearch, onToggleSettings }) => {
   const { user, clearUser } = userStore();
@@ -166,20 +167,7 @@ const Sidebar = ({ showUserSearch, showSettings, onToggleUserSearch, onToggleSet
           title="Account"
           type="button"
         >
-          {user?.avatar_url ? (
-            <img
-              src={user.avatar_url}
-              alt={`${user.username}'s profile`}
-              className="w-full h-full object-cover rounded-full"
-            />
-          ) : (
-            <span
-              className="flex items-center justify-center w-full h-full text-[11px] font-bold text-white rounded-full"
-              style={{ background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))' }}
-            >
-              {getInitials(user)}
-            </span>
-          )}
+          <Avatar user={user} size={36} />
           {/* Online indicator */}
           <span
             className="absolute bottom-[1px] right-[1px] w-2.5 h-2.5 rounded-full bg-green-500"
