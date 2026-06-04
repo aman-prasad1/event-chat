@@ -208,9 +208,58 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 
+const changePassword = asyncHandler(async (req, res) => {
+    try {
+        const { currentPassword, newPassword, confirmNewPassword } = req.body;
+        const userId = req.user.id;
+
+        if([newPassword, confirmNewPassword].some(field => !field || field.trim() === '')) {
+            throw new ApiError(400, 'All fields are required');
+        }
+
+        if(newPassword.length < 6) {
+            throw new ApiError(400, 'New password must be at least 6 characters long');
+        }
+
+        if(newPassword === currentPassword) {
+            throw new ApiError(400, 'New password must be different from the current password');
+        }
+
+        if(newPassword !== confirmNewPassword) {
+            throw new ApiError(400, 'New password and confirm new password do not match');
+        }
+
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            throw new ApiError(404, 'User not found');
+        }
+
+        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        if (!isCurrentPasswordValid) {
+            throw new ApiError(400, 'Current password is incorrect');
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        await prisma.user.update({
+            where: { id: userId },
+            data: { password: hashedNewPassword }
+        });
+
+        res
+            .status(200)
+            .json(
+                new ApiResponse(200, 'Password changed successfully')
+            );
+    } catch (error) {
+        throw new ApiError(error.statusCode || 500, error.message || 'Internal Server Error');
+    }
+});
+
+
 export { 
     register,
     login,
     refreshTokens,
-    logout
+    logout,
+    changePassword
 }
