@@ -5,7 +5,7 @@ import { userStore } from "../store/userStore";
 import { themeStore } from "../store/themeStore";
 import { useAuth } from "../hooks/useAuth";
 
-const Sidebar = ({ showUserSearch, onToggleUserSearch }) => {
+const Sidebar = ({ showUserSearch, showSettings, onToggleUserSearch, onToggleSettings }) => {
   const { user, clearUser } = userStore();
   const { theme, toggleTheme } = themeStore();
   const { logout } = useAuth();
@@ -107,16 +107,21 @@ const Sidebar = ({ showUserSearch, onToggleUserSearch }) => {
         <button
           className="flex items-center justify-center w-10 h-10 rounded-xl border-none cursor-pointer transition-all duration-200 hover:scale-105"
           style={{
-            backgroundColor: 'transparent',
-            color: 'var(--color-text-secondary)',
+            backgroundColor: showSettings ? 'var(--color-sidebar-active)' : 'transparent',
+            color: showSettings ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
           }}
+          onClick={onToggleSettings}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--color-border)';
-            e.currentTarget.style.color = 'var(--color-text-primary)';
+            if (!showSettings) {
+              e.currentTarget.style.backgroundColor = 'var(--color-border)';
+              e.currentTarget.style.color = 'var(--color-text-primary)';
+            }
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = 'var(--color-text-secondary)';
+            if (!showSettings) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--color-text-secondary)';
+            }
           }}
           title="Settings"
           type="button"
@@ -173,9 +178,9 @@ const Sidebar = ({ showUserSearch, onToggleUserSearch }) => {
           title="Account"
           type="button"
         >
-          {user?.profilePic ? (
+          {user?.avatar_url ? (
             <img
-              src={user.profilePic}
+              src={user.avatar_url}
               alt={`${user.username}'s profile`}
               className="w-full h-full object-cover rounded-full"
             />

@@ -68,6 +68,36 @@ const getUser = async () => {
   }
 };
 
+const updateProfile = async (formData) => {
+  const { setUser } = userStore.getState();
+
+  try {
+    const response = await axiosInstance.patch('/users/profile', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    const updatedUser = response.data.data.user;
+    setUser(updatedUser);
+    return updatedUser;
+  } catch (error) {
+    console.error('Profile update failed:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+const changePassword = async ({ currentPassword, newPassword, confirmNewPassword }) => {
+  try {
+    const response = await axiosInstance.post('/auth/change-password', {
+      currentPassword,
+      newPassword,
+      confirmNewPassword,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Password change failed:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 
 export const useAuth = () => {
   const registerMutation = useMutation({
@@ -93,5 +123,7 @@ export const useAuth = () => {
     login: loginMutation,
     logout: logoutMutation,
     getUser,
+    updateProfile,
+    changePassword,
   };
 }

@@ -5,12 +5,14 @@ import { chatStore } from "../store/chatStore";
 import Sidebar from "../components/Sidebar";
 import RecentChatsSideBar from "../components/RecentChatsSideBar";
 import UserSearchPanel from "../components/UserSearchPanel";
+import SettingsPanel from "../components/SettingsPanel";
 import ChatBox from "../components/ChatBox";
 
 const Home = () => {
   const { user } = userStore();
   const { selectedConversation } = chatStore();
   const [showUserSearch, setShowUserSearch] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -18,16 +20,23 @@ const Home = () => {
       <div className="max-lg:hidden h-full">
         <Sidebar
           showUserSearch={showUserSearch}
-          onToggleUserSearch={() => setShowUserSearch((prev) => !prev)}
+          showSettings={showSettings}
+          onToggleUserSearch={() => { setShowUserSearch((prev) => !prev); setShowSettings(false); }}
+          onToggleSettings={() => { setShowSettings((prev) => !prev); setShowUserSearch(false); }}
         />
       </div>
 
       {/* Recent chats or User search panel */}
       <div className={`max-lg:flex-1 ${selectedConversation ? "max-lg:hidden" : ""}`}>
-        {showUserSearch ? (
+        {showSettings ? (
+          <SettingsPanel onClose={() => setShowSettings(false)} />
+        ) : showUserSearch ? (
           <UserSearchPanel onClose={() => setShowUserSearch(false)} />
         ) : (
-          <RecentChatsSideBar onNewChat={() => setShowUserSearch(true)} />
+          <RecentChatsSideBar
+            onNewChat={() => setShowUserSearch(true)}
+            onOpenSettings={() => { setShowSettings(true); setShowUserSearch(false); }}
+          />
         )}
       </div>
 

@@ -8,7 +8,7 @@ import { useChat } from "../hooks/useChat";
 import { useAuth } from "../hooks/useAuth";
 import SearchBar from "./SearchBar";
 
-const RecentChatsSideBar = ({ onNewChat }) => {
+const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
   const { conversations, selectedConversation, isLoading, setSelectedConversation } = chatStore();
   const { user } = userStore();
   const { theme, toggleTheme } = themeStore();
@@ -109,6 +109,7 @@ const RecentChatsSideBar = ({ onNewChat }) => {
           <button
             className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm bg-transparent border-none cursor-pointer transition-all duration-150"
             style={{ color: 'var(--color-text-secondary)' }}
+            onClick={() => { setMenuOpen(false); onOpenSettings?.(); }}
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-text-primary)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
           >
