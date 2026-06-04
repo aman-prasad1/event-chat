@@ -15,6 +15,7 @@ import {
 } from "react-icons/ri";
 import { userStore } from "../store/userStore";
 import { useAuth } from "../hooks/useAuth";
+import { getInitials } from "../utils/getInitials";
 
 // ─── Extracted sub-components (defined outside to prevent remount on parent re-render) ───
 
@@ -208,14 +209,7 @@ const SettingsPanel = ({ onClose }) => {
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
 
-  const getInitials = () => {
-    if (!user) return "";
-    if (user.first_name && user.last_name) {
-      return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
-    }
-    if (user.username) return user.username[0].toUpperCase();
-    return "U";
-  };
+
 
   // ─── Avatar handling ───
   const handleAvatarSelect = (e) => {
@@ -372,7 +366,7 @@ const SettingsPanel = ({ onClose }) => {
                   className="flex items-center justify-center w-full h-full text-2xl font-bold text-white rounded-full"
                   style={{ backgroundColor: "var(--color-send-btn-bg)" }}
                 >
-                  {getInitials()}
+                  {getInitials(user)}
                 </span>
               )}
             </div>
@@ -586,7 +580,7 @@ const SettingsPanel = ({ onClose }) => {
                       backgroundColor: "var(--color-send-btn-bg)",
                     }}
                   >
-                    {getInitials()}
+                    {getInitials(user)}
                   </span>
                 )}
               </div>

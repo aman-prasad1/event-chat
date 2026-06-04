@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { RiChat3Fill, RiUserAddLine, RiSettings4Line, RiLogoutBoxRLine, RiSunLine, RiMoonLine } from "react-icons/ri";
 import { userStore } from "../store/userStore";
 import { themeStore } from "../store/themeStore";
 import { useAuth } from "../hooks/useAuth";
+import { useClickOutside } from "../hooks/useClickOutside";
+import { getInitials } from "../utils/getInitials";
 
 const Sidebar = ({ showUserSearch, showSettings, onToggleUserSearch, onToggleSettings }) => {
   const { user, clearUser } = userStore();
@@ -14,15 +16,8 @@ const Sidebar = ({ showUserSearch, showSettings, onToggleUserSearch, onToggleSet
   const navigate = useNavigate();
 
   // Close popup on outside click
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (accountRef.current && !accountRef.current.contains(e.target)) {
-        setAccountOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const accountCloseHandler = useCallback(() => setAccountOpen(false), []);
+  useClickOutside(accountRef, accountCloseHandler);
 
   const handleLogout = async () => {
     try {
@@ -35,14 +30,7 @@ const Sidebar = ({ showUserSearch, showSettings, onToggleUserSearch, onToggleSet
     }
   };
 
-  const getInitials = () => {
-    if (!user) return "";
-    if (user.first_name && user.last_name) {
-      return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
-    }
-    if (user.username) return user.username[0].toUpperCase();
-    return "U";
-  };
+
 
   return (
     <div
@@ -189,7 +177,7 @@ const Sidebar = ({ showUserSearch, showSettings, onToggleUserSearch, onToggleSet
               className="flex items-center justify-center w-full h-full text-[11px] font-bold text-white rounded-full"
               style={{ background: 'linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))' }}
             >
-              {getInitials()}
+              {getInitials(user)}
             </span>
           )}
           {/* Online indicator */}

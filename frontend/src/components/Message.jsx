@@ -1,14 +1,9 @@
 import React from "react";
 import { RiDownloadLine, RiFileTextLine } from "react-icons/ri";
+import { getInitials } from "../utils/getInitials";
 
 const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl, otherUser }) => {
-  const getInitials = (member) => {
-    if (member?.first_name && member?.last_name) {
-      return `${member.first_name[0]}${member.last_name[0]}`.toUpperCase();
-    }
-    if (member?.username) return member.username[0].toUpperCase();
-    return "U";
-  };
+
 
   return (
     <div className={`flex ${isSelf ? "justify-end" : "justify-start"} mb-2`}>

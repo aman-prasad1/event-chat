@@ -7,6 +7,8 @@ import { userStore } from "../store/userStore";
 import { useChat } from "../hooks/useChat";
 import { ToastContainer, toast } from "react-toastify";
 import { socket } from "../socketIo";
+import { getInitials } from "../utils/getInitials";
+import { formatMessageTime, formatDateSeparator, formatFileSize } from "../utils/formatters";
 import Message from "./Message";
 import "./ChatBox.css";
 
@@ -155,44 +157,7 @@ const ChatBox = () => {
     ? `${otherUser.first_name || ""} ${otherUser.last_name || ""}`.trim() || otherUser.username
     : "Chat";
 
-  const getInitials = (member) => {
-    if (member?.first_name && member?.last_name) {
-      return `${member.first_name[0]}${member.last_name[0]}`.toUpperCase();
-    }
-    if (member?.username) return member.username[0].toUpperCase();
-    return "U";
-  };
 
-  // Format message timestamp
-  const formatMessageTime = (dateStr) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-  };
-
-  const formatDateSeparator = (dateStr) => {
-    if (!dateStr) return "";
-
-    const date = new Date(dateStr);
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
-
-    const isSameDay = (left, right) =>
-      left.getFullYear() === right.getFullYear() &&
-      left.getMonth() === right.getMonth() &&
-      left.getDate() === right.getDate();
-
-    if (isSameDay(date, today)) return "Today";
-    if (isSameDay(date, yesterday)) return "Yesterday";
-
-    return date.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      year: date.getFullYear() !== today.getFullYear() ? "numeric" : undefined,
-    });
-  };
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
@@ -228,11 +193,7 @@ const ChatBox = () => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const formatFileSize = (bytes) => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
+
 
   const getFileIcon = (file) => {
     const type = file.type;

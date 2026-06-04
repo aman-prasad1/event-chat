@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { RiChat3Line, RiAttachment2, RiMenuLine, RiCloseLine, RiSettings4Line, RiLogoutBoxRLine, RiSunLine, RiMoonLine, RiUserAddLine } from "react-icons/ri";
 import { chatStore } from "../store/chatStore";
@@ -6,6 +6,9 @@ import { userStore } from "../store/userStore";
 import { themeStore } from "../store/themeStore";
 import { useChat } from "../hooks/useChat";
 import { useAuth } from "../hooks/useAuth";
+import { useClickOutside } from "../hooks/useClickOutside";
+import { getInitials } from "../utils/getInitials";
+import { formatRelativeTime } from "../utils/formatters";
 import SearchBar from "./SearchBar";
 
 const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
@@ -20,15 +23,8 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
   const menuRef = useRef(null);
 
   // Close menu on outside click
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const menuCloseHandler = useCallback(() => setMenuOpen(false), []);
+  useClickOutside(menuRef, menuCloseHandler);
 
   const handleLogout = async () => {
     try {
@@ -40,12 +36,7 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
     }
   };
 
-  const getUserInitials = () => {
-    if (!user) return "";
-    if (user.first_name && user.last_name) return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
-    if (user.username) return user.username[0].toUpperCase();
-    return "U";
-  };
+  const getUserInitials = () => getInitials(user);
 
   // Mobile menu dropdown
   const MobileMenu = () => (
@@ -140,21 +131,7 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
   }, []);
 
   // Format relative timestamp
-  const formatTime = (dateStr) => {
-    if (!dateStr) return "";
-    const now = new Date();
-    const date = new Date(dateStr);
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return "now";
-    if (diffMins < 60) return `${diffMins}m`;
-    if (diffHours < 24) return `${diffHours}h`;
-    if (diffDays < 7) return `${diffDays}d`;
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-  };
+  const formatTime = formatRelativeTime;
 
   // Get display name for the other user in the conversation
   const getDisplayInfo = (members) => {
@@ -168,13 +145,7 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
     };
   };
 
-  const getInitials = (member) => {
-    if (member.first_name && member.last_name) {
-      return `${member.first_name[0]}${member.last_name[0]}`.toUpperCase();
-    }
-    if (member.username) return member.username[0].toUpperCase();
-    return "U";
-  };
+
 
   // Get message preview text
   const getPreview = (latestMessage) => {

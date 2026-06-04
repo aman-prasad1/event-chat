@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { RiSearchLine, RiCloseLine, RiArrowLeftLine, RiUserAddLine, RiLoader4Line, RiUserSearchLine } from "react-icons/ri";
 import { useChat } from "../hooks/useChat";
 import { userStore } from "../store/userStore";
+import { getInitials } from "../utils/getInitials";
 
 const UserSearchPanel = ({ onClose }) => {
   const [query, setQuery] = useState("");
@@ -85,13 +86,7 @@ const UserSearchPanel = ({ onClose }) => {
     }
   };
 
-  const getInitials = (u) => {
-    if (u.first_name && u.last_name) {
-      return `${u.first_name[0]}${u.last_name[0]}`.toUpperCase();
-    }
-    if (u.username) return u.username[0].toUpperCase();
-    return "U";
-  };
+
 
   return (
     <aside
