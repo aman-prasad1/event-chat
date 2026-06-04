@@ -98,6 +98,26 @@ const changePassword = async ({ currentPassword, newPassword, confirmNewPassword
   }
 };
 
+const deleteAccount = async ({ password }) => {
+  const { clearUser, setIsLoading } = userStore.getState();
+  const { clearChat } = chatStore.getState();
+
+  setIsLoading(true);
+  try {
+    const response = await axiosInstance.delete('/auth/delete-account', {
+      data: { password },
+    });
+    clearUser();
+    clearChat();
+    return response.data;
+  } catch (error) {
+    console.error('Account deletion failed:', error.response?.data || error.message);
+    throw error;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
 export const useAuth = () => {
   const registerMutation = useMutation({
@@ -122,5 +142,6 @@ export const useAuth = () => {
     getUser,
     updateProfile,
     changePassword,
+    deleteAccount,
   };
 }

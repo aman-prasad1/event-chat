@@ -12,6 +12,7 @@ import { getInitials } from "../../utils/getInitials";
 import { SettingsRow, SectionHeader, Divider } from "./SettingsComponents";
 import EditProfileView from "./EditProfileView";
 import ChangePasswordView from "./ChangePasswordView";
+import DeleteAccountView from "./DeleteAccountView";
 
 const SettingsPanel = ({ onClose }) => {
   const { user } = userStore();
@@ -36,6 +37,17 @@ const SettingsPanel = ({ onClose }) => {
         style={{ backgroundColor: "var(--color-primary)", borderColor: "var(--color-border)" }}
       >
         <ChangePasswordView onBack={() => setActiveView("main")} />
+      </aside>
+    );
+  }
+
+  if (activeView === "deleteAccount") {
+    return (
+      <aside
+        className="w-[476px] min-w-[476px] max-lg:w-full max-lg:min-w-full flex flex-col overflow-hidden border-r transition-colors duration-300 h-screen"
+        style={{ backgroundColor: "var(--color-primary)", borderColor: "var(--color-border)" }}
+      >
+        <DeleteAccountView onBack={() => setActiveView("main")} />
       </aside>
     );
   }
@@ -158,6 +170,7 @@ const SettingsPanel = ({ onClose }) => {
           label="Delete Account"
           description="Permanently delete your account and data"
           danger
+          onClick={() => setActiveView("deleteAccount")}
         />
       </div>
     </aside>
