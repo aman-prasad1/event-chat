@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { RiChat3Line } from "react-icons/ri";
 import { userStore } from "../store/userStore";
 import { chatStore } from "../store/chatStore";
-import Sidebar from "../components/Sidebar";
-import RecentChatsSideBar from "../components/RecentChatsSideBar";
-import UserSearchPanel from "../components/UserSearchPanel";
-import SettingsPanel from "../components/SettingsPanel";
-import ChatBox from "../components/ChatBox";
+import Sidebar from "../components/sidebar/Sidebar";
+import RecentChatsSideBar from "../components/sidebar/RecentChatsSideBar";
+import UserSearchPanel from "../components/sidebar/UserSearchPanel";
+import SettingsPanel from "../components/settings/SettingsPanel";
+import ChatBox from "../components/chat/ChatBox";
 
 const Home = () => {
   const { user } = userStore();

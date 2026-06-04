@@ -8,9 +8,7 @@ import {
   RiEyeOffLine,
 } from "react-icons/ri";
 
-/**
- * A single row in the settings menu list.
- */
+// A single row in the settings menu list.
 export const SettingsRow = ({ icon: Icon, label, description, right, onClick, danger }) => (
   <button
     className={`flex items-center gap-3 w-full px-4 py-3 border-none bg-transparent text-left cursor-pointer transition-all duration-150 group ${danger ? "btn-danger-ghost" : "menu-item"}`}
@@ -53,9 +51,7 @@ export const SettingsRow = ({ icon: Icon, label, description, right, onClick, da
   </button>
 );
 
-/**
- * Uppercase section label.
- */
+// Uppercase section label.
 export const SectionHeader = ({ title }) => (
   <div className="px-4 pt-5 pb-1.5">
     <p
@@ -67,18 +63,14 @@ export const SectionHeader = ({ title }) => (
   </div>
 );
 
-/**
- * Horizontal divider line.
- */
+// Horizontal divider line.
 export const Divider = () => (
   <div className="mx-4 my-1">
     <div className="h-px" style={{ backgroundColor: "var(--color-border)" }} />
   </div>
 );
 
-/**
- * Colored banner for success/error feedback.
- */
+// Colored banner for success/error feedback.
 export const AlertBanner = ({ message, type }) => {
   if (!message) return null;
   const isError = type === "error";
@@ -98,9 +90,7 @@ export const AlertBanner = ({ message, type }) => {
   );
 };
 
-/**
- * Password field with show/hide toggle.
- */
+// Password field with show/hide toggle.
 export const PasswordInput = ({ label, value, onChange, show, onToggleShow, placeholder }) => (
   <div className="flex flex-col gap-1.5">
     <label className="text-[12px] font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>
@@ -130,9 +120,7 @@ export const PasswordInput = ({ label, value, onChange, show, onToggleShow, plac
   </div>
 );
 
-/**
- * Single-line text input with label.
- */
+// Single-line text input with label.
 export const TextInput = ({ label, value, onChange, placeholder }) => (
   <div className="flex flex-col gap-1.5">
     <label className="text-[12px] font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>
@@ -154,9 +142,7 @@ export const TextInput = ({ label, value, onChange, placeholder }) => (
   </div>
 );
 
-/**
- * Header with back arrow + title for sub-views.
- */
+// Header with back arrow + title for sub-views.
 export const SubViewHeader = ({ title, onBack }) => (
   <div className="px-5 flex items-center gap-3 h-[72px] shrink-0">
     <button

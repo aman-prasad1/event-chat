@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { RiSearchLine, RiCloseLine, RiArrowLeftLine, RiUserAddLine, RiLoader4Line, RiUserSearchLine } from "react-icons/ri";
-import { useChat } from "../hooks/useChat";
-import { userStore } from "../store/userStore";
-import { getInitials } from "../utils/getInitials";
-import Avatar from "./common/Avatar";
+import { useChat } from "../../hooks/useChat";
+import { userStore } from "../../store/userStore";
+import { getInitials } from "../../utils/getInitials";
+import Avatar from "../common/Avatar";
 
 const UserSearchPanel = ({ onClose }) => {
   const [query, setQuery] = useState("");

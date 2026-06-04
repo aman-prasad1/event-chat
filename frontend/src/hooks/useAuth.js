@@ -1,7 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { axiosInstance } from '../lib/axios';
-import { userStore } from '../store/userStore';
 import { chatStore } from '../store/chatStore';
+import { userStore } from '../store/userStore';
 
 const register = async (userData) => {
   const { setUser, setIsLoading } = userStore.getState();

@@ -29,7 +29,7 @@
     --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
 }
 
-/* ─── Dark Theme Overrides ─── */
+/* Dark Theme Overrides */
 [data-theme="dark"] {
     --color-primary: #171717;
     --color-chatbox-bg: #0a0a0a;
@@ -80,12 +80,12 @@ code, pre {
     font-size: 13px;
 }
 
-/* ─── Dark mode navbar glass override ─── */
+/* Dark mode navbar glass override */
 [data-theme="dark"] nav.sticky {
     background: rgba(15, 17, 23, 0.45) !important;
 }
 
-/* ─── Keyframe Animations ─── */
+/* Keyframe Animations */
 @keyframes dropdown-slide {
     from {
         opacity: 0;
@@ -112,7 +112,7 @@ code, pre {
     }
 }
 
-/* ─── Scrollbar utility ─── */
+/* Scrollbar utility */
 .scrollbar-thin::-webkit-scrollbar {
     width: 4px;
 }
@@ -138,7 +138,7 @@ html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
     background: transparent;
 }
 
-/* ─── Interactive utility classes ─── */
+/* Interactive utility classes */
 
 /* Ghost button: transparent → themed background on hover */
 .btn-ghost {

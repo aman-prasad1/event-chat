@@ -1,10 +1,9 @@
 import React from "react";
 import { formatMessageTime, formatDateSeparator } from "../../utils/formatters";
-import Message from "../Message";
+import Message from "./Message";
 
-/**
- * Scrollable messages list with date separators, loading indicator, and empty state.
- */
+
+// Scrollable messages list with date separators, loading indicator, and empty state.
 const MessagesList = ({
   messages,
   user,

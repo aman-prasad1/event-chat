@@ -1,12 +1,12 @@
 import React, { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { RiChat3Fill, RiUserAddLine, RiSettings4Line, RiLogoutBoxRLine, RiSunLine, RiMoonLine } from "react-icons/ri";
-import { userStore } from "../store/userStore";
-import { themeStore } from "../store/themeStore";
-import { useAuth } from "../hooks/useAuth";
-import { useClickOutside } from "../hooks/useClickOutside";
-import { getInitials } from "../utils/getInitials";
-import Avatar from "./common/Avatar";
+import { userStore } from "../../store/userStore";
+import { themeStore } from "../../store/themeStore";
+import { useAuth } from "../../hooks/useAuth";
+import { useClickOutside } from "../../hooks/useClickOutside";
+import { getInitials } from "../../utils/getInitials";
+import Avatar from "../common/Avatar";
 
 const Sidebar = ({ showUserSearch, showSettings, onToggleUserSearch, onToggleSettings }) => {
   const { user, clearUser } = userStore();

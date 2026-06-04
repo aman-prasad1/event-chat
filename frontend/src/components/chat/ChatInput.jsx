@@ -17,9 +17,7 @@ import { formatFileSize } from "../../utils/formatters";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
-/**
- * Returns an appropriate icon for the given file based on MIME type.
- */
+// Returns an appropriate icon for the given file based on MIME type.
 const getFileIcon = (file) => {
   const type = file.type;
   if (type.startsWith("image/")) return <RiImageLine size={14} />;
@@ -32,10 +30,8 @@ const getFileIcon = (file) => {
   return <RiAttachment2 size={14} />;
 };
 
-/**
- * Convert sanitized HTML from InputEmoji (which uses <br> for newlines)
- * into plain text with newline characters before sending.
- */
+// Convert sanitized HTML from InputEmoji (which uses <br> for newlines)
+// into plain text with newline characters before sending.
 const htmlToPlain = (html) => {
   if (!html) return "";
   let s = html.replace(/<br\s*\/?>/gi, "\n");
@@ -45,9 +41,7 @@ const htmlToPlain = (html) => {
   return s;
 };
 
-/**
- * Input bar with emoji picker, file selector, previews, and send button.
- */
+// Input bar with emoji picker, file selector, previews, and send button.
 const ChatInput = ({ input, setInput, sending, onSend, inputRef }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [fileSizeWarning, setFileSizeWarning] = useState("");

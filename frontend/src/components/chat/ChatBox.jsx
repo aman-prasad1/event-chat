@@ -1,12 +1,12 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { chatStore } from "../store/chatStore";
-import { userStore } from "../store/userStore";
-import { useChat } from "../hooks/useChat";
+import { chatStore } from "../../store/chatStore";
+import { userStore } from "../../store/userStore";
+import { useChat } from "../../hooks/useChat";
 import { ToastContainer, toast } from "react-toastify";
-import { socket } from "../socketIo";
-import ChatHeader from "./chat/ChatHeader";
-import MessagesList from "./chat/MessagesList";
-import ChatInput from "./chat/ChatInput";
+import { socket } from "../../lib/socket";
+import ChatHeader from "./ChatHeader";
+import MessagesList from "./MessagesList";
+import ChatInput from "./ChatInput";
 import "./ChatBox.css";
 
 const ChatBox = () => {
@@ -30,20 +30,20 @@ const ChatBox = () => {
   const pendingScrollAdjustmentRef = useRef(null);
   const toastRef = useRef(null);
 
-  // ─── Derived data ───
+  // Derived data
   const otherUser = selectedConversation?.members?.[0];
   const otherName = otherUser
     ? `${otherUser.first_name || ""} ${otherUser.last_name || ""}`.trim() || otherUser.username
     : "Chat";
 
-  // ─── Scrolling helpers ───
+  // Scrolling helpers
   const scrollMessagesToBottom = (behavior = "auto") => {
     const container = messagesContainerRef.current;
     if (!container) return;
     container.scrollTo({ top: container.scrollHeight, behavior });
   };
 
-  // ─── Fetch messages on conversation change ───
+  // Fetch messages on conversation change
   useEffect(() => {
     let isActive = true;
     pendingScrollAdjustmentRef.current = null;
@@ -75,7 +75,7 @@ const ChatBox = () => {
     return () => { isActive = false; };
   }, [selectedConversation]);
 
-  // ─── Infinite scroll for older messages ───
+  // Infinite scroll for older messages
   const loadOlderMessages = async () => {
     if (!selectedConversation?.conversationId || !nextCursor || isLoadingOlder) return;
 
@@ -106,7 +106,7 @@ const ChatBox = () => {
     if (container.scrollTop <= 40) loadOlderMessages();
   };
 
-  // ─── Preserve scroll position on prepend, pin to bottom otherwise ───
+  // Preserve scroll position on prepend, pin to bottom otherwise
   useLayoutEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
@@ -122,12 +122,12 @@ const ChatBox = () => {
     return () => window.cancelAnimationFrame(frameId);
   }, [messages]);
 
-  // ─── Focus input on conversation open ───
+  // Focus input on conversation open
   useEffect(() => {
     inputRef.current?.focus();
   }, [selectedConversation?.conversationId]);
 
-  // ─── Send handler (called by ChatInput) ───
+  // Send handler (called by ChatInput)
   const handleSend = async (text, files = []) => {
     if ((!text && files.length === 0) || sending) return;
     setSending(true);
@@ -174,7 +174,7 @@ const ChatBox = () => {
     }
   };
 
-  // ─── File download ───
+  // File download
   const handleGetFileUrl = async (msg) => {
     try {
       toastRef.current = toast.loading("Downloading file...");
@@ -195,7 +195,7 @@ const ChatBox = () => {
     }
   };
 
-  // ─── Loading skeleton ───
+  // Loading skeleton
   if (messagesLoading && messages.length === 0) {
     return (
       <div

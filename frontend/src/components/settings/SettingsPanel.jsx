@@ -7,17 +7,17 @@ import {
   RiCameraLine,
   RiDeleteBin6Line,
 } from "react-icons/ri";
-import { userStore } from "../store/userStore";
-import { getInitials } from "../utils/getInitials";
-import { SettingsRow, SectionHeader, Divider } from "./settings/SettingsComponents";
-import EditProfileView from "./settings/EditProfileView";
-import ChangePasswordView from "./settings/ChangePasswordView";
+import { userStore } from "../../store/userStore";
+import { getInitials } from "../../utils/getInitials";
+import { SettingsRow, SectionHeader, Divider } from "./SettingsComponents";
+import EditProfileView from "./EditProfileView";
+import ChangePasswordView from "./ChangePasswordView";
 
 const SettingsPanel = ({ onClose }) => {
   const { user } = userStore();
   const [activeView, setActiveView] = useState("main");
 
-  // ─── MAIN VIEW ───
+  // MAIN VIEW 
   if (activeView === "editProfile") {
     return (
       <aside
@@ -64,7 +64,7 @@ const SettingsPanel = ({ onClose }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto scrollbar-thin pb-6">
-        {/* ─── Profile Card ─── */}
+        {/* Profile Card */}
         <div
           className="mx-4 mt-2 mb-3 p-4 rounded-2xl"
           style={{
@@ -134,7 +134,7 @@ const SettingsPanel = ({ onClose }) => {
           </div>
         </div>
 
-        {/* ─── Account ─── */}
+        {/* Account */}
         <SectionHeader title="Account" />
         <SettingsRow
           icon={RiUserLine}
@@ -151,7 +151,7 @@ const SettingsPanel = ({ onClose }) => {
 
         <Divider />
 
-        {/* ─── Danger Zone ─── */}
+        {/* Danger Zone */}
         <SectionHeader title="Danger Zone" />
         <SettingsRow
           icon={RiDeleteBin6Line}

@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { themeStore } from './store/themeStore'
 import { useAuth } from './hooks/useAuth'
-import { socket } from './socketIo'
+import { socket } from './lib/socket'
 import { chatStore } from './store/chatStore'
 
 // Lazy load the component

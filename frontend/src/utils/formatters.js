@@ -39,9 +39,7 @@ export const formatDateSeparator = (dateStr) => {
   });
 };
 
-/**
- * Compact relative timestamp: "now", "3m", "2h", "5d", or "Jun 2".
- */
+// Compact relative timestamp: "now", "3m", "2h", "5d", or "Jun 2".
 export const formatRelativeTime = (dateStr) => {
   if (!dateStr) return "";
   const now = new Date();
@@ -58,9 +56,7 @@ export const formatRelativeTime = (dateStr) => {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
 
-/**
- * Human-readable file size: "12 B", "3.4 KB", "1.2 MB".
- */
+// Human-readable file size: "12 B", "3.4 KB", "1.2 MB".
 export const formatFileSize = (bytes) => {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;

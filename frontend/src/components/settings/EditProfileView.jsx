@@ -23,7 +23,7 @@ const EditProfileView = ({ onBack }) => {
   const [success, setSuccess] = useState("");
   const avatarInputRef = useRef(null);
 
-  // ─── Avatar handling ───
+  // Avatar handling
   const handleAvatarSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -42,7 +42,7 @@ const EditProfileView = ({ onBack }) => {
     setError("");
   };
 
-  // ─── Submit ───
+  // Submit
   const handleSave = async () => {
     setError("");
     setSuccess("");

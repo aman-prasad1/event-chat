@@ -2,9 +2,7 @@ import React from "react";
 import { RiArrowLeftLine } from "react-icons/ri";
 import Avatar from "../common/Avatar";
 
-/**
- * Header bar showing the other user's avatar, name, and a mobile back button.
- */
+// Header bar showing the other user's avatar, name, and a mobile back button.
 const ChatHeader = ({ otherUser, otherName, onBack }) => (
   <div
     className="flex items-center gap-3 px-5 h-[72px] border-b shrink-0"

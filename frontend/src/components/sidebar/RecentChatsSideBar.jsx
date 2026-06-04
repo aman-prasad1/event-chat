@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { RiChat3Line, RiAttachment2, RiMenuLine, RiCloseLine, RiSettings4Line, RiLogoutBoxRLine, RiSunLine, RiMoonLine, RiUserAddLine } from "react-icons/ri";
-import { chatStore } from "../store/chatStore";
-import { userStore } from "../store/userStore";
-import { themeStore } from "../store/themeStore";
-import { useChat } from "../hooks/useChat";
-import { useAuth } from "../hooks/useAuth";
-import { useClickOutside } from "../hooks/useClickOutside";
-import { getInitials } from "../utils/getInitials";
-import { formatRelativeTime } from "../utils/formatters";
-import Avatar from "./common/Avatar";
-import SearchBar from "./SearchBar";
+import { chatStore } from "../../store/chatStore";
+import { userStore } from "../../store/userStore";
+import { themeStore } from "../../store/themeStore";
+import { useChat } from "../../hooks/useChat";
+import { useAuth } from "../../hooks/useAuth";
+import { useClickOutside } from "../../hooks/useClickOutside";
+import { getInitials } from "../../utils/getInitials";
+import { formatRelativeTime } from "../../utils/formatters";
+import Avatar from "../common/Avatar";
+import SearchBar from "../common/SearchBar";
 
 const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
   const { conversations, selectedConversation, isLoading, setSelectedConversation } = chatStore();

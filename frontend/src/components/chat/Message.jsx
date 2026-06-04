@@ -1,6 +1,6 @@
 import React from "react";
 import { RiDownloadLine, RiFileTextLine } from "react-icons/ri";
-import Avatar from "./common/Avatar";
+import Avatar from "../common/Avatar";
 
 const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl, otherUser }) => {
 
