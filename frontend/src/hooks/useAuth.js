@@ -103,19 +103,16 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationKey: ['register'],
     mutationFn: register,
-    enabled: false,
   });
 
   const loginMutation = useMutation({
     mutationKey: ['login'],
     mutationFn: login,
-    enabled: false,
   });
 
   const logoutMutation = useMutation({
     mutationKey: ['logout'],
     mutationFn: logout,
-    enabled: false,
   });
 
   return {

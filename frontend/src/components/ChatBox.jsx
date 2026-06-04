@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { RiSendPlane2Fill, RiAttachment2, RiImageLine, RiVideoLine, RiMusicLine, RiFilePdfLine, RiFileExcel2Line, RiFileWord2Line, RiFileZipLine, RiErrorWarningLine, RiArrowLeftLine } from "react-icons/ri";
-import { IoClose, IoCloudyNight } from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 import InputEmoji from "react-input-emoji";
 import { chatStore } from "../store/chatStore";
 import { userStore } from "../store/userStore";

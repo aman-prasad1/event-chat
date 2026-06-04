@@ -1,8 +1,6 @@
-import { React, lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-// import Navbar from './components/Navbar'
 import { themeStore } from './store/themeStore'
-import { userStore } from './store/userStore'
 import { useAuth } from './hooks/useAuth'
 import { socket } from './socketIo'
 import { chatStore } from './store/chatStore'
@@ -15,7 +13,6 @@ const Home = lazy(() => import('./pages/Home'))
 
 // Route guard: verifies session via API before rendering children
 const ProtectedRoute = ({ children }) => {
-  const { user } = userStore();
   const { getUser } = useAuth();
   const [isChecking, setIsChecking] = useState(true);
   const [isAuthed, setIsAuthed] = useState(false);
@@ -80,7 +77,6 @@ const App = () => {
     <BrowserRouter>
       <Suspense fallback={<div>Loading...</div>}>
         <div className="min-h-screen font-sans">
-          {/* <Navbar /> */}
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
