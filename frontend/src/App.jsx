@@ -45,33 +45,33 @@ const ProtectedRoute = ({ children }) => {
 
 const App = () => {
   const { initTheme } = themeStore();
-  const { addMessage, selectedConversation, setLatestMessage, incrementUnreadCount } = chatStore();
 
   useEffect(() => {
     initTheme();
   }, [initTheme]);
 
 
-  // Socket.IO connection handling
+  // Socket.IO connection handling — subscribe once, read fresh state each time
   useEffect(() => {
     socket.on('message_received', (data) => {
+      const { selectedConversation, addMessage, setLatestMessage, incrementUnreadCount } = chatStore.getState();
+
       socket.emit('message_delivered', { messageId: data.message?.id });
 
       // add message to store if belongs to the currently selected conversation
-      if(selectedConversation && data.message.conversationId === selectedConversation.conversationId) {
+      if (selectedConversation && data.message.conversationId === selectedConversation.conversationId) {
         addMessage(data.message);
         socket.emit('message_seen', { messageId: data.message.id });
-      }
-      else {
+      } else {
         incrementUnreadCount(data.message.conversationId, data.message.id);
       }
       setLatestMessage(data.message.conversationId, data.message);
     });
 
     return () => {
-        socket.off('message_received');
+      socket.off('message_received');
     };
-  }, [selectedConversation]);
+  }, []);
 
   return (
     <BrowserRouter>
