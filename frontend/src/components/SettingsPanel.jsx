@@ -36,8 +36,8 @@ const SettingsRow = ({ icon: Icon, label, description, right, onClick, danger })
     <span
       className="shrink-0 flex items-center justify-center w-9 h-9 rounded-xl transition-colors duration-200"
       style={{
-        backgroundColor: danger ? "rgba(239, 68, 68, 0.08)" : "var(--color-sidebar-active)",
-        color: danger ? "#ef4444" : "var(--color-accent-primary)",
+        backgroundColor: danger ? "rgba(239, 68, 68, 0.08)" : "var(--color-border)",
+        color: danger ? "#ef4444" : "var(--color-text-primary)",
       }}
     >
       <Icon size={18} />
@@ -72,7 +72,7 @@ const SectionHeader = ({ title }) => (
   <div className="px-4 pt-5 pb-1.5">
     <p
       className="text-[11px] font-semibold uppercase tracking-wider m-0"
-      style={{ color: "var(--color-accent-primary)", opacity: 0.8 }}
+      style={{ color: "var(--color-text-primary)", opacity: 0.6 }}
     >
       {title}
     </p>
@@ -370,7 +370,7 @@ const SettingsPanel = ({ onClose }) => {
               ) : (
                 <span
                   className="flex items-center justify-center w-full h-full text-2xl font-bold text-white rounded-full"
-                  style={{ background: "linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))" }}
+                  style={{ backgroundColor: "var(--color-send-btn-bg)" }}
                 >
                   {getInitials()}
                 </span>
@@ -393,7 +393,7 @@ const SettingsPanel = ({ onClose }) => {
           <button
             onClick={() => avatarInputRef.current?.click()}
             className="text-[13px] font-medium border-none bg-transparent cursor-pointer transition-opacity duration-150 hover:opacity-70"
-            style={{ color: "var(--color-accent-primary)" }}
+            style={{ color: "var(--color-text-primary)" }}
             type="button"
           >
             Change photo
@@ -428,8 +428,8 @@ const SettingsPanel = ({ onClose }) => {
           disabled={profileSaving}
           className="flex items-center justify-center gap-2 w-full mt-6 px-4 py-3 rounded-xl border-none cursor-pointer text-sm font-semibold transition-all duration-200 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
-            backgroundColor: "var(--color-accent-primary)",
-            color: "#fff",
+            backgroundColor: "var(--color-send-btn-bg)",
+            color: "var(--color-send-btn-text)",
           }}
           type="button"
         >
@@ -504,8 +504,8 @@ const SettingsPanel = ({ onClose }) => {
           disabled={passwordSaving}
           className="flex items-center justify-center gap-2 w-full mt-6 px-4 py-3 rounded-xl border-none cursor-pointer text-sm font-semibold transition-all duration-200 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
-            backgroundColor: "var(--color-accent-primary)",
-            color: "#fff",
+            backgroundColor: "var(--color-send-btn-bg)",
+            color: "var(--color-send-btn-text)",
           }}
           type="button"
         >
@@ -583,8 +583,7 @@ const SettingsPanel = ({ onClose }) => {
                   <span
                     className="flex items-center justify-center w-full h-full text-lg font-bold text-white rounded-full"
                     style={{
-                      background:
-                        "linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-lighter))",
+                      backgroundColor: "var(--color-send-btn-bg)",
                     }}
                   >
                     {getInitials()}
@@ -620,8 +619,8 @@ const SettingsPanel = ({ onClose }) => {
               onClick={() => setActiveView("editProfile")}
               className="shrink-0 flex items-center justify-center w-9 h-9 rounded-xl border-none cursor-pointer transition-all duration-200 hover:scale-105"
               style={{
-                backgroundColor: "var(--color-sidebar-active)",
-                color: "var(--color-accent-primary)",
+                backgroundColor: "var(--color-border)",
+                color: "var(--color-text-primary)",
               }}
               title="Edit profile"
               type="button"

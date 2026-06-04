@@ -235,8 +235,8 @@ const UserSearchPanel = ({ onClose }) => {
                   style={{
                     backgroundColor: creatingFor === u.id
                       ? 'var(--color-border)'
-                      : 'var(--color-accent-primary)',
-                    color: '#fff',
+                      : 'var(--color-send-btn-bg)',
+                    color: 'var(--color-send-btn-text)',
                     opacity: creatingFor === u.id ? 0.7 : 1,
                   }}
                   title={`Start conversation with ${u.username}`}
