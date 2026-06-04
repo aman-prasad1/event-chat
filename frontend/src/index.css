@@ -137,3 +137,38 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
     background: transparent;
 }
+
+/* ─── Interactive utility classes ─── */
+
+/* Ghost button: transparent → themed background on hover */
+.btn-ghost {
+    background: transparent;
+    color: var(--color-text-secondary);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.btn-ghost:hover {
+    background-color: var(--color-border);
+    color: var(--color-text-primary);
+}
+
+/* Danger ghost: transparent → red tint on hover */
+.btn-danger-ghost {
+    background: transparent;
+    color: var(--color-text-secondary);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.btn-danger-ghost:hover {
+    background-color: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+}
+
+/* Menu item: generic dropdown/menu row */
+.menu-item {
+    background: transparent;
+    color: var(--color-text-secondary);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.menu-item:hover {
+    background-color: var(--color-border);
+    color: var(--color-text-primary);
+}

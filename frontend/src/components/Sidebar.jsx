@@ -120,20 +120,8 @@ const Sidebar = ({ showUserSearch, showSettings, onToggleUserSearch, onToggleSet
 
         {/* Theme toggle */}
         <button
-          className="relative flex items-center justify-center w-10 h-10 rounded-xl border-none cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden"
-          style={{
-            backgroundColor: 'transparent',
-            color: 'var(--color-text-secondary)',
-          }}
+          className="btn-ghost relative flex items-center justify-center w-10 h-10 rounded-xl border-none cursor-pointer transition-all duration-200 hover:scale-105 overflow-hidden"
           onClick={toggleTheme}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--color-border)';
-            e.currentTarget.style.color = 'var(--color-text-primary)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = 'var(--color-text-secondary)';
-          }}
           title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
           type="button"
         >
@@ -199,17 +187,8 @@ const Sidebar = ({ showUserSearch, showSettings, onToggleUserSearch, onToggleSet
             <div className="h-px" style={{ backgroundColor: 'var(--color-border)' }} />
             {/* Logout */}
             <button
-              className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm bg-transparent border-none cursor-pointer transition-all duration-150"
-              style={{ color: 'var(--color-text-secondary)' }}
+              className="btn-danger-ghost flex items-center gap-2.5 w-full px-4 py-2.5 text-sm border-none cursor-pointer"
               onClick={handleLogout}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.08)';
-                e.currentTarget.style.color = '#ef4444';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = 'var(--color-text-secondary)';
-              }}
             >
               <RiLogoutBoxRLine size={16} />
               <span>Log out</span>

@@ -76,11 +76,8 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
 
           {/* Theme toggle */}
           <button
-            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm bg-transparent border-none cursor-pointer transition-all duration-150"
-            style={{ color: 'var(--color-text-secondary)' }}
+            className="menu-item flex items-center gap-2.5 w-full px-4 py-2.5 text-sm border-none cursor-pointer"
             onClick={() => { toggleTheme(); setMenuOpen(false); }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-text-primary)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
           >
             {theme === "light" ? <RiMoonLine size={16} /> : <RiSunLine size={16} />}
             <span>{theme === "light" ? "Dark mode" : "Light mode"}</span>
@@ -88,11 +85,8 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
 
           {/* Settings */}
           <button
-            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm bg-transparent border-none cursor-pointer transition-all duration-150"
-            style={{ color: 'var(--color-text-secondary)' }}
+            className="menu-item flex items-center gap-2.5 w-full px-4 py-2.5 text-sm border-none cursor-pointer"
             onClick={() => { setMenuOpen(false); onOpenSettings?.(); }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-text-primary)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
           >
             <RiSettings4Line size={16} />
             <span>Settings</span>
@@ -102,11 +96,8 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
 
           {/* Logout */}
           <button
-            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm bg-transparent border-none cursor-pointer transition-all duration-150"
-            style={{ color: 'var(--color-text-secondary)' }}
+            className="btn-danger-ghost flex items-center gap-2.5 w-full px-4 py-2.5 text-sm border-none cursor-pointer"
             onClick={handleLogout}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.08)'; e.currentTarget.style.color = '#ef4444'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
           >
             <RiLogoutBoxRLine size={16} />
             <span>Log out</span>
@@ -158,16 +149,7 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
             {/* New chat button - mobile only */}
             <button
               onClick={onNewChat}
-              className="flex items-center justify-center w-9 h-9 rounded-xl border-none cursor-pointer transition-all duration-200 lg:hidden"
-              style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-border)';
-                e.currentTarget.style.color = 'var(--color-text-primary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = 'var(--color-text-secondary)';
-              }}
+              className="btn-ghost flex items-center justify-center w-9 h-9 rounded-xl border-none cursor-pointer transition-all duration-200 lg:hidden"
               title="New Chat"
               type="button"
             >
@@ -213,16 +195,7 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
           <div className="flex items-center gap-1">
             <button
               onClick={onNewChat}
-              className="flex items-center justify-center w-9 h-9 rounded-xl border-none cursor-pointer transition-all duration-200 lg:hidden"
-              style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-border)';
-                e.currentTarget.style.color = 'var(--color-text-primary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = 'var(--color-text-secondary)';
-              }}
+              className="btn-ghost flex items-center justify-center w-9 h-9 rounded-xl border-none cursor-pointer transition-all duration-200 lg:hidden"
               title="New Chat"
               type="button"
             >

@@ -98,16 +98,7 @@ const UserSearchPanel = ({ onClose }) => {
       <div className="px-5 flex items-center gap-3 h-[72px] shrink-0">
         <button
           onClick={onClose}
-          className="flex items-center justify-center w-9 h-9 rounded-xl border-none cursor-pointer transition-all duration-200 hover:scale-105"
-          style={{ backgroundColor: 'transparent', color: 'var(--color-text-secondary)' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--color-border)';
-            e.currentTarget.style.color = 'var(--color-text-primary)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = 'var(--color-text-secondary)';
-          }}
+          className="btn-ghost flex items-center justify-center w-9 h-9 rounded-xl border-none cursor-pointer transition-all duration-200 hover:scale-105"
           title="Back to chats"
           type="button"
         >
