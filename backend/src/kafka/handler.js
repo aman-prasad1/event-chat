@@ -18,8 +18,6 @@ const handleMessageTopic = async ({message}) => {
             }
         });
 
-        console.log("saved", savedMessage);
-
         // create message status + notify each member
         await Promise.all(
             members
