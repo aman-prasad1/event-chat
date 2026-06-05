@@ -134,6 +134,9 @@ const initializeSocket = (httpServer) => {
                     data: { status: 'delivered' }
                 });
 
+                // Clear conversation cache for both sender and recipient
+                await redisClient.del(`conversation:${message.senderId}`);
+                await redisClient.del(`conversation:${userId}`);
 
                 // Notify the sender about the delivery status update
                 await publishToRedis("message_delivered_update", {
@@ -171,6 +174,9 @@ const initializeSocket = (httpServer) => {
                     data: { status: 'seen' }
                 });
 
+                // Clear conversation cache for both sender and recipient
+                await redisClient.del(`conversation:${message.senderId}`);
+                await redisClient.del(`conversation:${userId}`);
 
                 // Notify the sender about the seen status update
                 await publishToRedis("message_seen_update", {
@@ -179,9 +185,6 @@ const initializeSocket = (httpServer) => {
                     conversationId: message.conversationId,
                     userId
                 });
-                
-                const cacheKey = `conversation:${userId}`;
-                await redisClient.del(cacheKey);
 
             } catch (error) {
                 console.error("Error in message_seen event: ", error);
