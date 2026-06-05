@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { chatStore } from "../../store/chatStore";
 import { userStore } from "../../store/userStore";
 import { useChat } from "../../hooks/useChat";
@@ -135,39 +135,41 @@ const ChatBox = () => {
     try {
       // Send files
       for (const file of files) {
+        const tempId = `temp-file-${Date.now()}-${Math.random()}`;
         const tempFileMsg = {
-          id: `temp-file-${Date.now()}-${Math.random()}`,
+          id: tempId,
           senderId: user.id,
           conversationId: selectedConversation.conversationId,
           type: "file",
-          content: { filename: file.name },
+          content: { filename: file.name, tempId },
           createdAt: new Date().toISOString(),
           _pending: true,
         };
         addMessage(tempFileMsg);
-        await sendFileMessage(selectedConversation.conversationId, file);
+        await sendFileMessage(selectedConversation.conversationId, file, tempId);
         markPendingFalse(tempFileMsg.id);
       }
 
       // Send text
       if (text) {
+        const tempId = `temp-${Date.now()}`;
         const tempMessage = {
-          id: `temp-${Date.now()}`,
+          id: tempId,
           senderId: user.id,
           conversationId: selectedConversation.conversationId,
           type: "text",
-          content: { text },
+          content: { text, tempId },
           createdAt: new Date().toISOString(),
           _pending: true,
         };
         addMessage(tempMessage);
         setInput("");
-        await sendMessage(selectedConversation.conversationId, text);
+        await sendMessage(selectedConversation.conversationId, text, tempId);
         markPendingFalse(tempMessage.id);
-        setLatestMessage(selectedConversation.conversationId, { ...tempMessage, content: { text } });
+        setLatestMessage(selectedConversation.conversationId, { ...tempMessage, content: { text, tempId } });
       }
     } catch (error) {
-      // TODO: Mark the temp messages as failed
+      console.error("Failed to send message:", error);
     } finally {
       setSending(false);
       inputRef.current?.focus();

@@ -68,8 +68,27 @@ const App = () => {
       setLatestMessage(data.message.conversationId, data.message);
     });
 
+    socket.on('message_sent', (data) => {
+      const { handleMessageSent } = chatStore.getState();
+      handleMessageSent(data.message);
+    });
+
+    socket.on('message_delivered_update', (data) => {
+      const { updateMessageStatus } = chatStore.getState();
+      console.log(data);
+      updateMessageStatus(data.messageId, 'delivered', data.userId);
+    });
+
+    socket.on('message_seen_update', (data) => {
+      const { updateMessageStatus } = chatStore.getState();
+      updateMessageStatus(data.messageId, 'seen', data.userId);
+    });
+
     return () => {
       socket.off('message_received');
+      socket.off('message_sent');
+      socket.off('message_delivered_update');
+      socket.off('message_seen_update');
     };
   }, []);
 

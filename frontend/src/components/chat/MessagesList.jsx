@@ -67,7 +67,6 @@ const MessagesList = ({
             )}
             <Message
               msg={msg}
-              user={user}
               isSelf={isSelf}
               messageTime={messageTime}
               onGetFileUrl={onGetFileUrl}

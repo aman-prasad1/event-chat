@@ -1,9 +1,36 @@
-import React from "react";
-import { RiDownloadLine, RiFileTextLine } from "react-icons/ri";
+import { RiDownloadLine, RiFileTextLine, RiCheckLine, RiCheckDoubleLine, RiTimeLine } from "react-icons/ri";
 import Avatar from "../common/Avatar";
 
-const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl, otherUser }) => {
+const Message = ({ msg, isSelf, messageTime, onGetFileUrl, otherUser }) => {
 
+  const getMessageStatus = () => {
+    if (msg._pending) return "pending";
+    if (!msg.statuses || msg.statuses.length === 0) return "sent";
+
+    const isAllSeen = msg.statuses.every(s => s.status === "seen");
+    if (isAllSeen) return "seen";
+
+    const isAllDeliveredOrSeen = msg.statuses.every(s => s.status === "delivered" || s.status === "seen");
+    if (isAllDeliveredOrSeen) return "delivered";
+
+    return "sent";
+  };
+
+  const renderStatusIcon = () => {
+    const status = getMessageStatus();
+    switch (status) {
+      case "pending":
+        return <RiTimeLine size={13} style={{ color: "var(--color-text-secondary)", opacity: 0.8 }} title="Pending" />;
+      case "sent":
+        return <RiCheckLine size={15} style={{ color: "var(--color-text-secondary)" }} title="Sent" />;
+      case "delivered":
+        return <RiCheckDoubleLine size={15} style={{ color: "var(--color-text-secondary)" }} title="Delivered" />;
+      case "seen":
+        return <RiCheckDoubleLine size={15} style={{ color: "#3b82f6" }} title="Seen" />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className={`flex ${isSelf ? "justify-end" : "justify-start"} mb-2`}>
@@ -111,14 +138,17 @@ const Message = ({ msg, user, isSelf, messageTime, onGetFileUrl, otherUser }) =>
           </div>
         )}
 
-        {messageTime && (
-          <span
-            className="text-[10px] mt-1 px-1"
-            style={{ color: "var(--color-text-secondary)" }}
-          >
-            {messageTime}
-          </span>
-        )}
+        <div className="flex items-center gap-1 mt-1 px-1">
+          {messageTime && (
+            <span
+              className="text-[10px]"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              {messageTime}
+            </span>
+          )}
+          {isSelf && renderStatusIcon()}
+        </div>
       </div>
       </div>
     </div>

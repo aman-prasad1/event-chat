@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { RiChat3Line, RiAttachment2, RiMenuLine, RiCloseLine, RiSettings4Line, RiLogoutBoxRLine, RiSunLine, RiMoonLine, RiUserAddLine } from "react-icons/ri";
+import { RiChat3Line, RiAttachment2, RiMenuLine, RiCloseLine, RiSettings4Line, RiLogoutBoxRLine, RiSunLine, RiMoonLine, RiUserAddLine, RiCheckLine, RiCheckDoubleLine, RiTimeLine } from "react-icons/ri";
 import { chatStore } from "../../store/chatStore";
 import { userStore } from "../../store/userStore";
 import { themeStore } from "../../store/themeStore";
@@ -124,6 +124,36 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
       avatar: other.avatar_url,
       initials: getInitials(other),
     };
+  };
+
+  const getMessageStatus = (msg) => {
+    if (!msg) return null;
+    if (msg._pending) return "pending";
+    if (!msg.statuses || msg.statuses.length === 0) return "sent";
+
+    const isAllSeen = msg.statuses.every(s => s.status === "seen");
+    if (isAllSeen) return "seen";
+
+    const isAllDeliveredOrSeen = msg.statuses.every(s => s.status === "delivered" || s.status === "seen");
+    if (isAllDeliveredOrSeen) return "delivered";
+
+    return "sent";
+  };
+
+  const renderStatusIcon = (msg) => {
+    const status = getMessageStatus(msg);
+    switch (status) {
+      case "pending":
+        return <RiTimeLine size={13} style={{ color: "var(--color-text-secondary)", opacity: 0.8 }} className="shrink-0" title="Pending" />;
+      case "sent":
+        return <RiCheckLine size={15} style={{ color: "var(--color-text-secondary)" }} className="shrink-0" title="Sent" />;
+      case "delivered":
+        return <RiCheckDoubleLine size={15} style={{ color: "var(--color-text-secondary)" }} className="shrink-0" title="Delivered" />;
+      case "seen":
+        return <RiCheckDoubleLine size={15} style={{ color: "#3b82f6" }} className="shrink-0" title="Seen" />;
+      default:
+        return null;
+    }
   };
 
 
@@ -262,7 +292,7 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
       <SearchBar onSearch={setSearchQuery} />
       <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
         {sortedConversations.map((conv) => {
-          const { name, username, avatar, initials } = getDisplayInfo(conv.members);
+          const { name } = getDisplayInfo(conv.members);
           const isActive = selectedConversation?.conversationId === conv.conversationId;
           const preview = getPreview(conv.latestMessage);
           const time = formatTime(conv.latestMessage?.createdAt);
@@ -301,15 +331,16 @@ const RecentChatsSideBar = ({ onNewChat, onOpenSettings }) => {
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <span
-                    className="text-[13px] truncate flex-1 min-w-0"
+                    className="text-[13px] truncate flex-1 min-w-0 flex items-center gap-1"
                     style={{ color: 'var(--color-text-secondary)' }}
                   >
                     {isSelf && (
-                      <span className="font-medium" style={{ color: 'var(--color-accent-primary)' }}>
-                        You:{" "}
+                      <span className="font-medium shrink-0" style={{ color: 'var(--color-accent-primary)' }}>
+                        You:
                       </span>
                     )}
-                    {preview}
+                    {isSelf && conv.latestMessage && renderStatusIcon(conv.latestMessage)}
+                    <span className="truncate flex-1">{preview}</span>
                   </span>
                   {conv.unreadCount > 0 && (
                     <span

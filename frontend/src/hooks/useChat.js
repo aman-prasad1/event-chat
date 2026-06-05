@@ -39,13 +39,11 @@ const getMessages = async (conversationId, cursor = null, limit = 20) => {
   }
 };
 
-const sendMessage = async (conversationId, text) => {
-  const { addMessage } = chatStore.getState();
-
+const sendMessage = async (conversationId, text, tempId) => {
   try {
     const response = await axiosInstance.post('/messages', {
       conversationId,
-      content: JSON.stringify({ text }),
+      content: JSON.stringify({ text, tempId }),
       type: 'text',
     });
     return response.data.data;
@@ -55,13 +53,13 @@ const sendMessage = async (conversationId, text) => {
   }
 };
 
-const sendFileMessage = async (conversationId, file) => {
+const sendFileMessage = async (conversationId, file, tempId) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('conversationId', conversationId);
     formData.append('type', 'file');
-    formData.append('content', JSON.stringify({ filename: file.name }));
+    formData.append('content', JSON.stringify({ filename: file.name, tempId }));
 
     const response = await axiosInstance.post('/messages', formData, {
       headers: {
