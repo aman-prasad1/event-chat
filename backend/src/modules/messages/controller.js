@@ -97,7 +97,10 @@ const getConverstionMessages = asyncHandler(async (req, res) => {
             ...(req.query.cursor && {
                 cursor: { id: req.query.cursor },
                 skip: 1
-            })
+            }),
+            include: {
+                statuses: true
+            }
         });
 
         res
@@ -231,7 +234,8 @@ const getRecentConversations = asyncHandler(async (req, res) => {
                         senderId: true,
                         type: true,
                         content: true,
-                        createdAt: true
+                        createdAt: true,
+                        statuses: true
                     }
                 },
                 members: {

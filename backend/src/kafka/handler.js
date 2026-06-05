@@ -4,7 +4,7 @@ import { redisClient } from '../redis/index.js';
 import { deleteFromCloudinary } from '../utils/cloudinary.js';
 
 
-const handleMessageTopic = async ({message}) => {
+const handleMessageTopic = async ({ message }) => {
     try {
         const { conversationId, senderId, content, type, members } = JSON.parse(message.value.toString());
 
@@ -19,11 +19,11 @@ const handleMessageTopic = async ({message}) => {
         });
 
         // create message status + notify each member
-        await Promise.all(
+        const createdStatuses = await Promise.all(
             members
                 .filter(m => m.userId !== senderId)
                 .map(async (m) => {
-                    await prisma.messageStatus.create({
+                    const statusRecord = await prisma.messageStatus.create({
                         data: {
                             messageId: savedMessage.id,
                             userId: m.userId,
@@ -36,11 +36,28 @@ const handleMessageTopic = async ({message}) => {
                     if (online) {
                         await publishToRedis('message_received', {
                             recipientId: m.userId,
-                            message: savedMessage
+                            message: {
+                                ...savedMessage,
+                                statuses: [statusRecord]
+                            }
                         });
                     }
+                    return statusRecord;
                 })
         );
+
+        // Notify the sender that the message is successfully saved
+        const senderOnline = await isUserOnline(senderId);
+        if (senderOnline) {
+            console.log(senderId);
+            await publishToRedis('message_sent', {
+                recipientId: senderId,
+                message: {
+                    ...savedMessage,
+                    statuses: createdStatuses
+                }
+            });
+        }
 
         // invalidate conversation cache for all members
         await Promise.all(
@@ -56,7 +73,7 @@ const handleMessageTopic = async ({message}) => {
 }
 
 
-const handleAvatarCleanupTopic = async ({message}) => {
+const handleAvatarCleanupTopic = async ({ message }) => {
     try {
         const { avatar_key } = JSON.parse(message.value.toString());
 
