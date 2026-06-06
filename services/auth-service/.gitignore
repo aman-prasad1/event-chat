@@ -1,0 +1,27 @@
+node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.sample
+!.evn.sample
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# OS/editor files
+.DS_Store
+.vscode/
+
+# Build and coverage artifacts
+dist/
+build/
+coverage/
+
+# Prisma generated client output (configured in prisma/schema.prisma)
+src/generated/client/
