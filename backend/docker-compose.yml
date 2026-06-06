@@ -1,5 +1,19 @@
 services:
 
+  auth-service:
+    build:
+      context: ../services/auth-service
+    ports:
+      - "8001:8001"
+    env_file:
+      - ../services/auth-service/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/event_chat
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
   app:
     build:
       context: ./

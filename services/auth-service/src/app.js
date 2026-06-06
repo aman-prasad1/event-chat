@@ -25,7 +25,7 @@ app.get('/health', (req, res) => {
 import authRouter from './modules/auth/router.js';
 
 // use routers
-app.use('/auth', authRouter);
+app.use('api/v1/auth', authRouter);
 
 app.use(errorMiddleware);
 export default app;

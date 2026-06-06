@@ -28,7 +28,7 @@ import userRouter from './modules/user/router.js';
 import { error } from 'console';
 
 // use routers
-app.use('/api/v1/auth', authRouter);
+// app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/messages', messagesRouter);
 app.use('/api/v1/users', userRouter);
 
