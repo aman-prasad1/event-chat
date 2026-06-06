@@ -4,7 +4,8 @@ import { uploadAvatar } from '../../middlewares/multer.middleware.js';
 import {
     getUserProfile,
     searchUsers,
-    updateUserProfile
+    updateUserProfile,
+    deleteAccount
 } from './controller.js';
 
 
@@ -16,5 +17,6 @@ router
 
 
 router.get('/search', authenticateAccessToken, uploadAvatar.single('avatar'), searchUsers);
+router.delete('/delete-account', authenticateAccessToken, deleteAccount);
 
 export default router;

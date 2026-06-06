@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import fs from 'fs';
 import { AVATAR_CLEANUP_TOPIC } from '../../constants.js';
 import { prisma } from '../../db/index.js';
@@ -144,8 +145,56 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     }
 })
 
+const deleteAccount = asyncHandler(async (req, res) => {
+    try {
+        const { password } = req.body;
+        const userId = req.user.id;
+
+        if(!password || password.trim() === '') {
+            throw new ApiError(400, 'Password is required');
+        }
+
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            throw new ApiError(404, 'User not found');
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new ApiError(400, 'Password is incorrect');
+        }
+        
+
+        // if user has a custom avatar, send message to Kafka to delete it from cloudinary
+        const avatar_key = user.avatar_key;
+        if(avatar_key) {
+            await kafkaProducer.send({
+                topic: AVATAR_CLEANUP_TOPIC,
+                messages: [
+                    {
+                        value: JSON.stringify({ avatar_key })
+                    }
+                ]
+            });
+        }
+
+        await prisma.user.delete({ where: { id: userId } });
+
+        res
+            .status(200)
+            .clearCookie('accessToken', { path: '/' })
+            .clearCookie('refreshToken', { path: '/' })
+            .json(
+                new ApiResponse(200, 'Account deleted successfully')
+            );
+    } catch (error) {
+        throw new ApiError(error.statusCode || 500, error.message || 'Internal Server Error');
+    }
+});
+
 export {
-    getUserProfile,
+    deleteAccount, getUserProfile,
     searchUsers,
     updateUserProfile
 };
+

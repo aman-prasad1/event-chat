@@ -104,7 +104,7 @@ const deleteAccount = async ({ password }) => {
 
   setIsLoading(true);
   try {
-    const response = await axiosInstance.delete('/auth/delete-account', {
+    const response = await axiosInstance.delete('/users/delete-account', {
       data: { password },
     });
     clearUser();
