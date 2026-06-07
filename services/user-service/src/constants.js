@@ -1,0 +1,1 @@
+export const AVATAR_CLEANUP_TOPIC = 'avatar_cleanup';
