@@ -22,15 +22,10 @@ app.get('/health', (req, res) => {
 
 
 // import routers
-import authRouter from './modules/auth/router.js';
 import messagesRouter from './modules/messages/router.js';
-import userRouter from './modules/user/router.js';
-import { error } from 'console';
 
 // use routers
-// app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/messages', messagesRouter);
-app.use('/api/v1/users', userRouter);
 
 app.use(errorMiddleware);
 export default app;

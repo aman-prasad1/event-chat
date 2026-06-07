@@ -1,7 +1,6 @@
 import { prisma } from '../db/index.js';
 import { publishToRedis, isUserOnline } from '../socketIo.js';
 import { redisClient } from '../redis/index.js';
-import { deleteFromCloudinary } from '../utils/cloudinary.js';
 
 
 const handleMessageTopic = async ({ message }) => {
@@ -73,19 +72,6 @@ const handleMessageTopic = async ({ message }) => {
 }
 
 
-const handleAvatarCleanupTopic = async ({ message }) => {
-    try {
-        const { avatar_key } = JSON.parse(message.value.toString());
-
-        // delete avatar from cloudinary
-        await deleteFromCloudinary(avatar_key);
-    } catch (error) {
-        console.error('Error processing avatar cleanup:', error);
-        throw error;
-    }
-}
-
 export {
-    handleMessageTopic,
-    handleAvatarCleanupTopic
+    handleMessageTopic
 }
