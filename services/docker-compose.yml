@@ -2,11 +2,11 @@ services:
 
   auth-service:
     build:
-      context: ../services/auth-service
+      context: ./auth-service
     ports:
       - "8001:8001"
     env_file:
-      - ../services/auth-service/.env
+      - ./auth-service/.env
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/event_chat
     depends_on:
@@ -16,11 +16,11 @@ services:
 
   user-service:
     build:
-      context: ../services/user-service
+      context: ./user-service
     ports:
       - "8002:8002"
     env_file:
-      - ../services/user-service/.env
+      - ./user-service/.env
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/event_chat
     depends_on:
@@ -30,13 +30,13 @@ services:
         condition: service_started
     restart: unless-stopped
 
-  app:
+  chat-service:
     build:
-      context: ./
+      context: ./chat-service
     ports:
       - "8000:8000"
     env_file:
-      - ./.env
+      - ./chat-service/.env
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/event_chat
       REDIS_URL: redis://redis:6379
