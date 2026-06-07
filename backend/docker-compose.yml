@@ -14,6 +14,22 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  user-service:
+    build:
+      context: ../services/user-service
+    ports:
+      - "8002:8002"
+    env_file:
+      - ../services/user-service/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/event_chat
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    restart: unless-stopped
+
   app:
     build:
       context: ./
