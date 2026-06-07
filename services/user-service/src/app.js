@@ -25,7 +25,7 @@ app.get('/health', (req, res) => {
 import userRouter from './modules/user/router.js';
 
 // use routers
-app.use('/api/v1/users', userRouter);
+app.use('/api/v1/user', userRouter);
 
 app.use(errorMiddleware);
 export default app;
