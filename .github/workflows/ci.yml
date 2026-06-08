@@ -4,9 +4,12 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
 
 jobs:
-  validate-backend:
+  validate-chat-service:
     runs-on: ubuntu-latest
 
     env:
@@ -21,18 +24,76 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: services/chat-service/package-lock.json
 
       - name: Install dependencies
-        working-directory: backend
+        working-directory: services/chat-service
         run: npm ci
 
       - name: Generate Prisma client
-        working-directory: backend
+        working-directory: services/chat-service
         run: npx prisma generate
 
       - name: Check for syntax errors
-        working-directory: backend
+        working-directory: services/chat-service
+        run: node --input-type=module --check < src/index.js
+
+  validate-auth-service:
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/dummy_db
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: services/auth-service/package-lock.json
+
+      - name: Install dependencies
+        working-directory: services/auth-service
+        run: npm ci
+
+      - name: Generate Prisma client
+        working-directory: services/auth-service
+        run: npx prisma generate
+
+      - name: Check for syntax errors
+        working-directory: services/auth-service
+        run: node --input-type=module --check < src/index.js
+
+  validate-user-service:
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/dummy_db
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: services/user-service/package-lock.json
+
+      - name: Install dependencies
+        working-directory: services/user-service
+        run: npm ci
+
+      - name: Generate Prisma client
+        working-directory: services/user-service
+        run: npx prisma generate
+
+      - name: Check for syntax errors
+        working-directory: services/user-service
         run: node --input-type=module --check < src/index.js
 
   validate-frontend:

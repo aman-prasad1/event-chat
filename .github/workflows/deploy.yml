@@ -19,7 +19,7 @@ jobs:
           script: |
             cd projects/event-chat
             git pull origin main
-            cd backend
+            cd services
             docker compose down
             docker compose up --build -d
             docker image prune -f
