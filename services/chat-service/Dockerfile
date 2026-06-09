@@ -1,4 +1,4 @@
-FROM node:20-alpine AS dev
+FROM node:22-alpine AS dev
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ CMD ["npm", "run", "dev"]
 
 
 # Production stage
-FROM node:20-alpine as prod
+FROM node:22-alpine as prod
 
 WORKDIR /app
 
