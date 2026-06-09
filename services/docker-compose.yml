@@ -1,3 +1,5 @@
+name: event-chat
+
 services:
 
   auth-service:
