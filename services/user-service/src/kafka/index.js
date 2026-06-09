@@ -10,7 +10,7 @@ const kafka = new Kafka({
 });
 
 const producer = kafka.producer();
-const consumer = kafka.consumer({ groupId: 'messaging-group' });
+const consumer = kafka.consumer({ groupId: 'user-service-group' });
 
 const connectKafka = async () => {
     await producer.connect();
