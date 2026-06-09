@@ -1,4 +1,20 @@
-FROM node:20-alpine
+FROM node:20-alpine AS dev
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY prisma ./prisma
+RUN npx prisma generate
+
+EXPOSE 8000
+
+CMD ["npm", "run", "dev"]
+
+
+# Production stage
+FROM node:20-alpine as prod
 
 WORKDIR /app
 

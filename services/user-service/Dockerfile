@@ -1,4 +1,20 @@
-FROM node:20-alpine
+FROM node:20-alpine AS dev
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY prisma ./prisma
+RUN npx prisma generate
+
+EXPOSE 8002
+
+CMD ["npm", "run", "dev"]
+
+
+# Production stage
+FROM node:20-alpine as prod
 
 WORKDIR /app
 
@@ -18,4 +34,4 @@ COPY . .
 EXPOSE 8002
 
 # Run migrations then start the server
-CMD ["sh", "-c", "npx prisma migrate deploy && node src/index.js"]
+CMD ["node", "src/index.js"]
