@@ -3,14 +3,14 @@ name: event-chat
 services:
 
   nginx:
-    image: nginx:alpine
+    image: jonasal/nginx-certbot:latest
     ports:
       - "80:80"
       - "443:443"
     env_file:
       - ./.env
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx.conf:/etc/nginx/user_conf.d/default.conf
       - certbot_data:/etc/letsencrypt
     depends_on:
       - auth-service

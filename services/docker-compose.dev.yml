@@ -7,7 +7,7 @@ services:
     ports:
       - "8080:80"     # only nginx exposes a port
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx.dev.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - auth-service
       - user-service
