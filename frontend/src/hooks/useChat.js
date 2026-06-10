@@ -89,7 +89,7 @@ const getFileUrl = async (conversationId, messageId) => {
 
 const searchUsers = async (query) => {
   try {
-    const response = await axiosInstance.get('/users/search', {
+    const response = await axiosInstance.get('/user/search', {
       params: { query },
     });
     return response.data.data.users;

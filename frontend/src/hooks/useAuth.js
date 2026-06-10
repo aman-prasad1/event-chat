@@ -59,7 +59,7 @@ const getUser = async () => {
   const { setUser, clearUser } = userStore.getState();
 
   try {
-    const response = await axiosInstance.get('/users/profile');
+    const response = await axiosInstance.get('/user/profile');
     setUser(response.data.data.user);
     return response.data.data.user;
   } catch (error) {
@@ -72,7 +72,7 @@ const updateProfile = async (formData) => {
   const { setUser } = userStore.getState();
 
   try {
-    const response = await axiosInstance.patch('/users/profile', formData, {
+    const response = await axiosInstance.patch('/user/profile', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     const updatedUser = response.data.data.user;
@@ -104,7 +104,7 @@ const deleteAccount = async ({ password }) => {
 
   setIsLoading(true);
   try {
-    const response = await axiosInstance.delete('/users/delete-account', {
+    const response = await axiosInstance.delete('/user/delete-account', {
       data: { password },
     });
     clearUser();
