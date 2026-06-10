@@ -18,7 +18,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd projects/event-chat
-            git pull origin main
+            git fetch origin
+            git reset --hard origin/main
             cd services
             docker compose down
             docker compose up --build -d
