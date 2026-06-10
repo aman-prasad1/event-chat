@@ -6,8 +6,12 @@ services:
     image: nginx:alpine
     ports:
       - "80:80"
+      - "443:443"
+    env_file:
+      - ./.env
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - certbot_data:/etc/letsencrypt
     depends_on:
       - auth-service
       - user-service
@@ -59,3 +63,6 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     restart: unless-stopped
+
+volumes:
+  certbot_data:
