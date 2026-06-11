@@ -22,6 +22,8 @@ services:
     build:
       context: ./auth-service
       target: prod
+    volumes:
+      - auth_node_modules:/app/node_modules
     env_file:
       - ./auth-service/.env
     restart: unless-stopped
@@ -30,6 +32,8 @@ services:
     build:
       context: ./user-service
       target: prod
+    volumes:
+      - user_node_modules:/app/node_modules
     env_file:
       - ./user-service/.env
     restart: unless-stopped
@@ -40,6 +44,8 @@ services:
     build:
       context: ./chat-service
       target: prod
+    volumes:
+      - chat_node_modules:/app/node_modules
     env_file:
       - ./chat-service/.env
     restart: unless-stopped
@@ -66,3 +72,6 @@ services:
 
 volumes:
   certbot_data:
+  auth_node_modules:
+  user_node_modules:
+  chat_node_modules:
