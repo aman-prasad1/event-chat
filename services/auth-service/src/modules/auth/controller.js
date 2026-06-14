@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
-
+import { redisClient } from '../../redis/index.js';
 
 const generateAccessToken = (user) => {
     const payload = {
@@ -199,6 +199,12 @@ const logout = asyncHandler(async (req, res) => {
             where: { id: userId },
             data: { refresh_Token: null }
         });
+
+        // Blacklist the access token
+        const accessToken = req.cookies?.accessToken;
+        if (accessToken) {
+            await redisClient.set(`blacklisted:${accessToken}`, 'true', 'EX', 20 * 60); // Blacklist for 20 minutes
+        }
 
         // Clear the cookies
         res
