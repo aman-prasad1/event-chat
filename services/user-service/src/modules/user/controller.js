@@ -180,6 +180,12 @@ const deleteAccount = asyncHandler(async (req, res) => {
 
         await prisma.user.delete({ where: { id: userId } });
 
+        // Blacklist the access token
+        const accessToken = req.cookies?.accessToken;
+        if (accessToken) {
+            await redisClient.set(`blacklisted:${accessToken}`, 'true', 'EX', 20 * 60); // Blacklist for 20 minutes
+        }
+
         res
             .status(200)
             .clearCookie('accessToken', { path: '/' })
