@@ -10,15 +10,21 @@ import { uploadOnCloudinary } from '../../utils/cloudinary.js';
 
 
 const getUserProfile = asyncHandler(async (req, res) => {
-    const user = {
-        id: req.user.id,
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        username: req.user.username,
-        avatar_url: req.user.avatar_url,
-        createdAt: req.user.createdAt,
-        updatedAt: req.user.updatedAt
-    }
+
+    const id = req.user.id;
+
+    const user = await prisma.user.findUnique({
+        where: { id },
+        select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            username: true,
+            avatar_url: true,
+            createdAt: true,
+            updatedAt: true
+        }
+    })
 
     res
         .status(200)
