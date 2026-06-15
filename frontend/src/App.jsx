@@ -56,13 +56,13 @@ const App = () => {
     socket.on('message_received', (data) => {
       const { selectedConversation, addMessage, setLatestMessage, incrementUnreadCount } = chatStore.getState();
 
-      socket.emit('message_delivered', { messageId: data.message?.id });
-
-      // add message to store if belongs to the currently selected conversation
+      // If the conversation is already open, emit seen directly (skip delivered)
       if (selectedConversation && data.message.conversationId === selectedConversation.conversationId) {
         addMessage(data.message);
         socket.emit('message_seen', { messageId: data.message.id });
       } else {
+        // Only emit delivered when the conversation is not currently open
+        socket.emit('message_delivered', { messageId: data.message?.id });
         incrementUnreadCount(data.message.conversationId, data.message.id);
       }
       setLatestMessage(data.message.conversationId, data.message);
