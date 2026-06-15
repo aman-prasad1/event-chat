@@ -48,7 +48,6 @@ const handleMessageTopic = async ({ message }) => {
         // Notify the sender that the message is successfully saved
         const senderOnline = await isUserOnline(senderId);
         if (senderOnline) {
-            console.log(senderId);
             await publishToRedis('message_sent', {
                 recipientId: senderId,
                 message: {

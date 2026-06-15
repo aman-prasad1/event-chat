@@ -112,20 +112,18 @@ const getConverstionMessages = asyncHandler(async (req, res) => {
 
 });
 
+
+const getConversationMembers = async (conversationId) => {
+    const members = await prisma.conversationMember.findMany({
+        where: { conversationId },
+        select: { userId: true }
+    });
+    return members;
+}
+
 const createConversationMessage = asyncHandler(async (req, res) => {
     try {
         const { conversationId, content, type } = req.body;
-
-        // Membership validation
-        const member = await prisma.conversationMember.findFirst({
-            where: {
-                conversationId,
-                userId: req.user.id
-            }
-        });
-        if (!member) {
-            throw new ApiError(403, 'You are not a member of this conversation');
-        }
 
         let parsedContent;
 
@@ -170,10 +168,12 @@ const createConversationMessage = asyncHandler(async (req, res) => {
             throw new ApiError(400, 'Unsupported message type');
         }
 
-        const members = await prisma.conversationMember.findMany({
-            where: { conversationId },
-            select: { userId: true }
-        });
+        const members = await getConversationMembers(conversationId);
+
+        // check sender is a member of the conversation
+        if(!members.some(m => m.userId === req.user.id)) {
+            throw new ApiError(403, 'You are not a member of this conversation');
+        }
 
 
         // produce message to Kafka topic for asynchronous processing
