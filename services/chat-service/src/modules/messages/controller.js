@@ -114,10 +114,22 @@ const getConverstionMessages = asyncHandler(async (req, res) => {
 
 
 const getConversationMembers = async (conversationId) => {
+
+    // check if members list avalilbale in cache
+    const cacheKey = `conversationMembers:${conversationId}`;
+    const cachedMembers = await redisClient.get(cacheKey);
+    if (cachedMembers) {
+        return JSON.parse(cachedMembers);
+    }
+
     const members = await prisma.conversationMember.findMany({
         where: { conversationId },
         select: { userId: true }
     });
+
+    // cache the members list for 30 minutes
+    await redisClient.set(cacheKey, JSON.stringify(members), 'EX', 60 * 30);
+
     return members;
 }
 
