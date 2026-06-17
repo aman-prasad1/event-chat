@@ -172,3 +172,9 @@ html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
     background-color: var(--color-border);
     color: var(--color-text-primary);
 }
+
+/* Top loader pulse animation (for inline loaders) */
+@keyframes top-loader-pulse {
+    0%   { width: 30%; opacity: 0.6; }
+    100% { width: 90%; opacity: 1; }
+}

@@ -4,6 +4,7 @@ import { themeStore } from './store/themeStore'
 import { useAuth } from './hooks/useAuth'
 import { socket } from './lib/socket'
 import { chatStore } from './store/chatStore'
+import TopLoader from './components/common/TopLoader'
 
 // Lazy load the component
 const Login = lazy(() => import('./pages/Login'))
@@ -33,7 +34,7 @@ const ProtectedRoute = ({ children }) => {
   }, []);
 
   if (isChecking) {
-    return <div className="auth-loading">Verifying session...</div>;
+    return <TopLoader />;
   }
 
   if (!isAuthed) {
@@ -94,7 +95,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<TopLoader />}>
         <div className="min-h-screen font-sans">
           <Routes>
             <Route path="/login" element={<Login />} />
