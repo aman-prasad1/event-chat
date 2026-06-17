@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   RiArrowLeftLine,
   RiUserLine,
@@ -6,8 +7,10 @@ import {
   RiPencilLine,
   RiCameraLine,
   RiDeleteBin6Line,
+  RiLogoutBoxRLine,
 } from "react-icons/ri";
 import { userStore } from "../../store/userStore";
+import { useAuth } from "../../hooks/useAuth";
 import { getInitials } from "../../utils/getInitials";
 import { SettingsRow, SectionHeader, Divider } from "./SettingsComponents";
 import EditProfileView from "./EditProfileView";
@@ -16,7 +19,19 @@ import DeleteAccountView from "./DeleteAccountView";
 
 const SettingsPanel = ({ onClose }) => {
   const { user } = userStore();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [activeView, setActiveView] = useState("main");
+
+  const handleLogout = async () => {
+    try {
+      await logout.mutateAsync();
+    } catch (error) {
+      // user state is already cleared inside the hook
+    } finally {
+      navigate("/login");
+    }
+  };
 
   // MAIN VIEW 
   if (activeView === "editProfile") {
@@ -165,6 +180,13 @@ const SettingsPanel = ({ onClose }) => {
 
         {/* Danger Zone */}
         <SectionHeader title="Danger Zone" />
+        <SettingsRow
+          icon={RiLogoutBoxRLine}
+          label="Log Out"
+          description="Sign out of your account"
+          danger
+          onClick={handleLogout}
+        />
         <SettingsRow
           icon={RiDeleteBin6Line}
           label="Delete Account"
