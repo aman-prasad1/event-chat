@@ -33,7 +33,7 @@ const SignUp = () => {
       });
 
       if (res) {
-        navigate("/");
+        navigate("/", { replace: true });
       }
     } catch (error) {
       toast.error(

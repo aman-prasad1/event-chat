@@ -31,7 +31,7 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     // Skip auth endpoints to prevent infinite loops
-    const skipPaths = ["/auth/login", "/auth/register", "/auth/refresh-tokens"];
+    const skipPaths = ["/auth/login", "/auth/register", "/auth/refresh-tokens", "/user/profile"];
     if (
       error.response?.status !== 401 ||
       originalRequest._retry ||
@@ -58,7 +58,6 @@ axiosInstance.interceptors.response.use(
       processQueue(refreshError);
       userStore.getState().clearUser();
       chatStore.getState().clearChat();
-      window.location.href = "/login";
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

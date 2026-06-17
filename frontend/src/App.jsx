@@ -44,6 +44,37 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+// Route guard: redirects authenticated users away from guest-only pages
+const GuestRoute = ({ children }) => {
+  const { getUser } = useAuth();
+  const [isChecking, setIsChecking] = useState(true);
+  const [isAuthed, setIsAuthed] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        await getUser();
+        setIsAuthed(true);
+      } catch {
+        setIsAuthed(false);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  if (isChecking) {
+    return <TopLoader />;
+  }
+
+  if (isAuthed) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
 const App = () => {
   const { initTheme } = themeStore();
 
@@ -98,8 +129,8 @@ const App = () => {
       <Suspense fallback={<TopLoader />}>
         <div className="min-h-screen font-sans">
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
+            <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+            <Route path="/signup" element={<GuestRoute><SignUp /></GuestRoute>} />
             <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           </Routes>
         </div>

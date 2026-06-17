@@ -33,7 +33,7 @@ const Login = () => {
       });
       
       if(res) {
-        navigate('/')
+        navigate('/', { replace: true })
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed. Please try again.');
