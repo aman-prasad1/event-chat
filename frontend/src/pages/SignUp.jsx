@@ -10,7 +10,7 @@ const SignUp = () => {
 
   const navigate = useNavigate();
   const { user } = userStore();
-  const { register } = useAuth();
+  const { register, login } = useAuth();
 
   const handleIsPasswordHidden = () => {
     setIsPasswordHidden(!isPasswordHidden);
@@ -33,6 +33,11 @@ const SignUp = () => {
       });
 
       if (res) {
+        // Auto-login with the same credentials
+        await login.mutateAsync({
+          username: userData.username,
+          password: userData.password,
+        });
         navigate("/", { replace: true });
       }
     } catch (error) {
