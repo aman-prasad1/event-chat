@@ -47,7 +47,7 @@ const createDirectConversation = asyncHandler(async (req, res) => {
                 members: {
                     create: [
                         { userId: req.user.id },
-                        { userId }
+                        { userId: userId }
                     ]
                 }
             }
